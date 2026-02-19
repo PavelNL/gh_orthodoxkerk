@@ -408,3 +408,25 @@ td.gsvW0{padding-left:20px}
 .iLLnT{position:absolute;right:16px;bottom:16px;z-index:2001;width:58px;height:58px;border:none;border-radius:50%;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.24);cursor:pointer;transition:box-shadow .2s;transition-delay:1s;-webkit-user-select:none;-moz-user-select:none;user-select:none}@media only screen and (min-width:1023px){.iLLnT{right:0;bottom:0}}.EGb3p{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:auto;border-radius:50%}
 *{margin:0;padding:0}
 body,html{margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:#fff;scroll-behavior:smooth}
+
+
+/* Jimdo runtime CSS-in-JS rules (were injected by JS at load time) */
+.css-k90t27{background-color:#000000 !important;border-radius:0 !important}
+.css-k90t27 .tmAjb{background-color:#000000 !important;border-color:#000000 !important}
+.css-1wta0f{border-color:transparent !important}
+.css-2uvc2u{background-color:rgba(234,232,228,0.80)}
+.css-1dx5wtp{min-height:calc(100vh - 0px)}
+.css-9s1hn{background-color:#FFFFFF}
+.css-1st5hyz{background-color:#eae8e4}
+.css-znbo4h{background:#eae8e4}
+body,html{background:#eae8e4 !important}
+.css-1c375l0 .hugeTitleFontSize h1:not(.customScale){font-size:64px !important}
+.css-1c375l0 h1:not(.customScale){font-size:48px !important}
+.css-1c375l0 h2:not(.customScale){font-size:36px !important}
+.css-1c375l0 h3:not(.customScale),.css-1c375l0 h4:not(.customScale),.css-1c375l0 h5:not(.customScale),.css-1c375l0 h6:not(.customScale){font-size:24px !important}
+.css-1c375l0 p:not(.customScale){font-size:18px !important}
+.css-1c375l0 li:not(.customScale){font-size:18px !important}
+@media only screen and (max-width:1280px){.css-1c375l0 h1:not(.customScale){font-size:36px !important}.css-1c375l0 h2:not(.customScale){font-size:24px !important}.css-1c375l0 h3:not(.customScale),.css-1c375l0 h4:not(.customScale),.css-1c375l0 h5:not(.customScale),.css-1c375l0 h6:not(.customScale){font-size:18px !important}.css-1c375l0 p:not(.customScale){font-size:16px !important}.css-1c375l0 li:not(.customScale){font-size:16px !important}}
+@media only screen and (max-width:800px){.css-1c375l0 .hugeTitleFontSize h1:not(.customScale){font-size:40px !important}}
+/* CSS-only dropdown for submenu (replaces Jimdo JS toggle) */
+.IrqE3.quswf:hover .Vqmxx.u_r8R{display:block}
