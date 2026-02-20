@@ -144,15 +144,11 @@ h1 strong, h2 strong, h3 strong {
   height: 72px;
 }
 
-/* Jimdo layout: nav LEFT, logo RIGHT */
-.site-nav {
-  order: -1;
-}
-
+/* Logo LEFT, nav RIGHT */
 .site-logo {
-  order: 1;
+  order: -1;
   font-family: 'Raleway', sans-serif;
-  font-size: 1.25rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-decoration: none;
   color: var(--pico-color);
@@ -179,10 +175,14 @@ h1 strong, h2 strong, h3 strong {
   padding: 0;
 }
 
+.site-nav {
+  order: 1;
+}
+
 .site-nav a {
   display: block;
   padding: 8px 14px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-decoration: none;
   color: var(--pico-color);
   white-space: nowrap;
@@ -199,7 +199,7 @@ h1 strong, h2 strong, h3 strong {
 }
 
 .site-nav .has-children .arrow {
-  font-size: 0.6em;
+  font-size: 0.8em;
   margin-left: 4px;
   vertical-align: middle;
 }
@@ -230,32 +230,35 @@ h1 strong, h2 strong, h3 strong {
 
 .site-nav .submenu a {
   padding: 6px 20px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 /* Mobile hamburger */
 .nav-toggle {
   display: none;
-  background: none;
-  border: none;
+  background: none !important;
+  border: none !important;
   cursor: pointer;
   padding: 8px;
   font-size: 1.5rem;
-  color: var(--pico-color);
+  color: #000 !important;
   margin: 0;
   width: auto;
   line-height: 1;
   border-radius: 0;
-  box-shadow: none;
+  box-shadow: none !important;
   order: 2;
+  --pico-background-color: transparent;
+  --pico-color: #000;
 }
 
 .nav-toggle:hover,
 .nav-toggle:focus {
-  background: none;
-  border: none;
-  box-shadow: none;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
   --pico-box-shadow: none;
+  color: #000 !important;
 }
 
 @media (max-width: 768px) {
@@ -367,7 +370,7 @@ main {
   color: #fff !important;
   padding: 12px 32px;
   text-decoration: none !important;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.05em;
   border: none;
@@ -463,30 +466,39 @@ main {
   padding: 20px 24px 60px;
 }
 
+/* Month header (e.g. "Февраль-2025") */
 .schedule-month {
   font-family: 'Raleway', sans-serif;
   font-weight: 300;
-  font-size: 28px;
-  margin: 40px 0 16px;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  margin: 48px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #333;
 }
 
 .schedule-month:first-child {
   margin-top: 0;
 }
 
+/* Section title row (e.g. "ВЕЛИКИЙ ПОСТ С 23 ФЕВРАЛЯ...") */
 .schedule-title td {
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
-  font-size: 16px;
-  padding: 10px 12px;
-  background: #f0eeea;
+  font-size: 0.875rem;
+  letter-spacing: 0.03em;
+  padding: 12px 12px;
+  background: #e8e5e0;
+  color: #333;
 }
 
 .schedule-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 32px;
-  font-size: 15px;
+  font-size: 0.85rem;
+  line-height: 1.5;
   /* PicoCSS table resets */
   --pico-border-color: transparent;
   border: none;
@@ -496,33 +508,44 @@ main {
   border: none;
 }
 
+/* Table column headers */
 .schedule-table th {
   text-align: left;
   padding: 8px 12px;
-  border-bottom: 2px solid #333;
+  border-bottom: 1px solid #999;
   border-top: none;
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #666;
   white-space: nowrap;
   background: transparent;
-  color: inherit;
 }
 
+/* Regular table cell (light weight) */
 .schedule-table td {
   padding: 8px 12px;
   border-bottom: 1px solid #e0ddd8;
   border-top: none;
   vertical-align: top;
   background: transparent;
-  color: inherit;
+  color: #333;
+  font-weight: 300;
+}
+
+/* Bold text inside cells (feast days, important events) */
+.schedule-table td strong {
+  font-weight: 500;
+  color: #000;
 }
 
 .schedule-table tr:last-child td {
   border-bottom: none;
 }
 
-.schedule-table td:first-child { white-space: nowrap; width: 40px; text-align: center; }
+.schedule-table td:first-child { white-space: nowrap; width: 40px; text-align: center; font-weight: 500; color: #000; }
 .schedule-table td:nth-child(2) { white-space: nowrap; width: 110px; }
 .schedule-table td:nth-child(4) { white-space: nowrap; width: 90px; }
 .schedule-table td:nth-child(5) { white-space: nowrap; width: 120px; }
@@ -539,14 +562,29 @@ main {
 }
 
 @media (max-width: 600px) {
-  .schedule-table { font-size: 13px; }
+  .schedule-month { font-size: 1.25rem; }
+  .schedule-table { font-size: 0.78rem; }
   .schedule-table th, .schedule-table td { padding: 6px 8px; }
+  .schedule-table th { font-size: 0.7rem; }
+  .schedule-title td { font-size: 0.78rem; }
 }
 
 /* --- Contact page --- */
 .contact-map {
   width: 100%;
   margin-bottom: 1.5rem;
+}
+
+/* --- Info columns (Kontakty grid) --- */
+.info-columns h3 {
+  font-size: 0.95rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.info-columns p,
+.info-columns li {
+  font-size: 0.80rem;
 }
 
 /* --- Support/donate hero section (O-nas page) --- */
@@ -626,6 +664,35 @@ img {
   height: auto;
 }
 
+/* --- Content column widths --- */
+.content-medium {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.content-medium p {
+  font-size: 0.70rem;
+}
+
+.content-narrow {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.content-narrow p,
+.content-narrow li {
+  font-size: 0.9rem;
+}
+
+.content-narrow img.page-photo {
+  display: block;
+  width: 100%;
+  margin: 0 auto 1.5rem;
+  border-radius: 4px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -635,4 +702,59 @@ img {
   overflow: hidden;
   clip: rect(0,0,0,0);
   border: 0;
+}
+
+/* --- Lightbox (fullscreen image viewer) --- */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+.lightbox img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  color: #fff;
+  font-size: 2.5rem;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10000;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: auto;
+  box-shadow: none;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+  opacity: 0.7;
+  background: none;
+  border: none;
+  box-shadow: none;
+  --pico-box-shadow: none;
+}
+
+img[data-lightbox] {
+  cursor: pointer;
 }

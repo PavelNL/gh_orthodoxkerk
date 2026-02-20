@@ -21,10 +21,10 @@
           <ul class="submenu">
             <li><a href="../glavnaya/novosti/index.html">Новости</a></li>
             <li><a href="../glavnaya/meropriyatiya/index.html">Мероприятия</a></li>
-            <li><a href="../glavnaya/raspisanie/index.html">Расписание</a></li>
             <li><a href="../glavnaya/voskresnaya-shkola/index.html">Воскресная школа</a></li>
           </ul>
         </li>
+        <li><a href="../raspisanie/index.html">Расписание</a></li>
         <li><a href="../pozhertvovaniya/index.html">Пожертвования</a></li>
         <li><a href="../galereya/index.html">Галерея</a></li>
         <li><a href="../kontakty/index.html">Контакты</a></li>
@@ -33,11 +33,12 @@
     </div>
   </header>
   <main class="container">
+    <div class="content-medium">
     <h2>Контакты</h2>
 
-    <img src="../img/GoogleMaps_STATIC.png" alt="Расположение храма на карте — Google Maps" class="contact-map" loading="lazy">
+    <img src="../img/GoogleMaps_STATIC.png" alt="Расположение храма на карте — Google Maps" class="contact-map" loading="lazy" data-lightbox>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2rem;">
+    <div class="info-columns" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2rem;">
       <section>
         <h3>Адрес</h3>
         <p><em>Alexander Nevskikerk, Schiedamsesingel 220, 3012 BA Rotterdam, Nederland</em></p>
@@ -63,11 +64,12 @@
     </div>
 
     <section>
-      <h2>Связаться с нами</h2>
+      <h3>Связаться с нами</h3>
       <p>Для связи с нами напишите нам на электронную почту:</p>
       <p><a href="mailto:ruskerk.rdam@gmail.com" class="btn-primary">Написать письмо</a></p>
       <p style="font-size:0.85rem; color:#888;" lang="nl">Onze <a href="../privacyverklaring/index.html">privacyverklaring</a> is van toepassing.</p>
     </section>
+    </div><!-- /.content-medium -->
   </main>
   <footer class="site-footer">
     <p>Храм Святого Благоверного Великого князя Александра Невского</p>
@@ -79,5 +81,6 @@
       <a href="../cookie-instellingen/index.html">Cookie-instellingen</a>
     </div>
   </footer>
+  <script src="../js/lightbox.js"></script>
 </body>
 </html>

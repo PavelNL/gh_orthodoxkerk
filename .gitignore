@@ -1,5 +1,10 @@
 #
 *.bak
 *.zip
-html.prev/
 
+.DS_Store
+
+html.prev/
+_webarc_orig_v0/
+_webarc_orig_v1/
+_webarc_Jimdo_alike_v1/
