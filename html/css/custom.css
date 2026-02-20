@@ -1,0 +1,638 @@
+/* ==========================================================================
+   orthodoxkerk.nl — Custom styles (PicoCSS overrides)
+   ========================================================================== */
+
+/* --- Color scheme --- */
+/* Must match PicoCSS specificity: :root:not([data-theme=dark]) */
+:root:not([data-theme=dark]) {
+  --pico-background-color: #eae8e4;
+  --pico-color: #000;
+  --pico-primary: #000;
+  --pico-primary-hover: #333;
+  --pico-primary-underline: rgba(0,0,0,.5);
+  --pico-primary-hover-underline: rgba(0,0,0,.5);
+  --pico-secondary: #666;
+  --pico-muted-color: #888;
+  --pico-muted-border-color: #d8d5d0;
+  --pico-card-background-color: #fff;
+  --pico-card-border-color: transparent;
+  --pico-card-box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  --pico-font-family: 'Roboto', sans-serif;
+  --pico-font-weight: 300;
+  --pico-line-height: 1.6;
+  --pico-border-radius: 4px;
+  --pico-block-spacing-vertical: 2rem;
+  --pico-block-spacing-horizontal: 1.5rem;
+  --pico-h1-color: #000;
+  --pico-h2-color: #000;
+  --pico-h3-color: #000;
+  --pico-h4-color: #000;
+  --pico-h5-color: #000;
+  --pico-h6-color: #000;
+  --pico-table-border-color: #e0ddd8;
+  color-scheme: light;
+}
+
+body {
+  background: #eae8e4;
+  font-weight: 300;
+  color: #000;
+}
+
+/* --- PicoCSS element resets --- */
+
+/* Reset article: PicoCSS adds padding, margin, max-width, box-shadow */
+.image-grid article {
+  margin-bottom: 0;
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+  max-width: none;
+}
+
+/* Reset header inside article */
+.image-grid article header {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+/* Reset footer inside article */
+.image-grid article footer {
+  margin: 0;
+  padding: 0;
+  border: none;
+  text-align: left;
+}
+
+/* Reset section: PicoCSS adds margin-bottom */
+main section {
+  margin-bottom: 0;
+}
+
+/* Reset nav */
+.site-header nav {
+  justify-content: flex-end;
+}
+
+/* Reset links: PicoCSS adds underlines */
+a {
+  --pico-text-decoration: none;
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  --pico-text-decoration: none;
+}
+
+/* Restore underline for content text links */
+main p a,
+main li a {
+  text-decoration: underline;
+}
+
+main p a:hover,
+main li a:hover {
+  text-decoration: none;
+}
+
+/* No underline for CTA buttons */
+main p a.btn-primary,
+main li a.btn-primary {
+  text-decoration: none;
+}
+
+/* --- Typography --- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  --pico-font-weight: 300;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.75rem; margin-top: 2rem; }
+h3 { font-size: 1.25rem; }
+
+strong, b,
+h1 strong, h2 strong, h3 strong {
+  font-weight: 500;
+}
+
+/* --- Site header (fixed top bar) --- */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #eae8e4;
+  border-bottom: 1px solid #d8d5d0;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 72px;
+}
+
+/* Jimdo layout: nav LEFT, logo RIGHT */
+.site-nav {
+  order: -1;
+}
+
+.site-logo {
+  order: 1;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--pico-color);
+  white-space: nowrap;
+}
+
+.site-logo:hover {
+  color: var(--pico-color);
+  text-decoration: none;
+}
+
+/* --- Navigation --- */
+.site-nav {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.site-nav li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav a {
+  display: block;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--pico-color);
+  white-space: nowrap;
+}
+
+.site-nav a:hover {
+  opacity: 0.6;
+  text-decoration: none;
+}
+
+/* Dropdown submenu */
+.site-nav .has-children {
+  position: relative;
+}
+
+.site-nav .has-children .arrow {
+  font-size: 0.6em;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.site-nav .submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  border-radius: 4px;
+  z-index: 200;
+}
+
+.site-nav .has-children:hover .submenu {
+  display: block;
+}
+
+.site-nav .submenu li {
+  margin: 0;
+  padding: 0;
+}
+
+.site-nav .submenu a {
+  padding: 6px 20px;
+  font-size: 0.85rem;
+}
+
+/* Mobile hamburger */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  font-size: 1.5rem;
+  color: var(--pico-color);
+  margin: 0;
+  width: auto;
+  line-height: 1;
+  border-radius: 0;
+  box-shadow: none;
+  order: 2;
+}
+
+.nav-toggle:hover,
+.nav-toggle:focus {
+  background: none;
+  border: none;
+  box-shadow: none;
+  --pico-box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: block;
+  }
+
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: #eae8e4;
+    border-bottom: 1px solid #d8d5d0;
+    padding: 12px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,.08);
+    order: 3;
+  }
+
+  .site-nav.open {
+    display: flex;
+  }
+
+  .site-nav a {
+    padding: 10px 24px;
+  }
+
+  .site-nav .submenu {
+    position: static;
+    box-shadow: none;
+    background: transparent;
+    padding-left: 20px;
+  }
+
+  .site-nav .has-children:hover .submenu,
+  .site-nav .submenu {
+    display: block;
+  }
+}
+
+/* Offset main content for fixed header (Jimdo uses 112px) */
+main {
+  padding-top: 112px;
+}
+
+/* --- Hero cover section (home, voskresnaya-shkola) --- */
+.hero-cover {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* Break out of .container max-width + padding */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-top: -112px;
+  margin-bottom: 2rem;
+  padding: 140px 2rem 80px;
+  overflow: hidden;
+}
+
+.hero-cover .hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-cover .hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-cover .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(234, 232, 228, 0.80);
+  z-index: 1;
+}
+
+.hero-cover .hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.hero-cover h1 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .hero-cover {
+    min-height: 60vh;
+    padding: 120px 1.5rem 60px;
+  }
+  .hero-cover h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Black CTA button */
+.btn-primary {
+  display: inline-block;
+  background: #000;
+  color: #fff !important;
+  padding: 12px 32px;
+  text-decoration: none !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #333;
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+/* --- White content sections (matching Jimdo css-9s1hn) --- */
+.section-white {
+  background: #fff;
+  /* Break out of container to go full-width */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 2rem calc(50vw - 50%);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* --- Image grid (gallery, events, donations) --- */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.image-grid img {
+  width: 100%;
+  height: auto;
+}
+
+/* Cards inside image-grid: white background, shadow */
+.image-grid article {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+/* Square images in cards (matching Jimdo padding-bottom:100%) */
+.image-grid article img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* Gallery: square crops like Jimdo */
+.image-grid--gallery img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* Events: 3:1 landscape images like Jimdo */
+.image-grid--events article img {
+  aspect-ratio: 3 / 1;
+  object-fit: cover;
+}
+
+/* --- Vertical card stack (Novosti — full-width cards, one per row) --- */
+.card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.card-stack article {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  overflow: hidden;
+  /* Reset PicoCSS article */
+  margin-bottom: 0;
+  padding: 0;
+  max-width: none;
+  border-radius: 0;
+}
+
+.card-stack article img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* --- Schedule table --- */
+.schedule-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+}
+
+.schedule-month {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  font-size: 28px;
+  margin: 40px 0 16px;
+}
+
+.schedule-month:first-child {
+  margin-top: 0;
+}
+
+.schedule-title td {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 10px 12px;
+  background: #f0eeea;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+  font-size: 15px;
+  /* PicoCSS table resets */
+  --pico-border-color: transparent;
+  border: none;
+}
+
+.schedule-table thead {
+  border: none;
+}
+
+.schedule-table th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 2px solid #333;
+  border-top: none;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  background: transparent;
+  color: inherit;
+}
+
+.schedule-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0ddd8;
+  border-top: none;
+  vertical-align: top;
+  background: transparent;
+  color: inherit;
+}
+
+.schedule-table tr:last-child td {
+  border-bottom: none;
+}
+
+.schedule-table td:first-child { white-space: nowrap; width: 40px; text-align: center; }
+.schedule-table td:nth-child(2) { white-space: nowrap; width: 110px; }
+.schedule-table td:nth-child(4) { white-space: nowrap; width: 90px; }
+.schedule-table td:nth-child(5) { white-space: nowrap; width: 120px; }
+
+/* PicoCSS resets for schedule table rows */
+.schedule-table tbody tr {
+  border: none;
+  background: transparent;
+}
+
+.schedule-table tbody tr:nth-child(odd),
+.schedule-table tbody tr:nth-child(even) {
+  background: transparent;
+}
+
+@media (max-width: 600px) {
+  .schedule-table { font-size: 13px; }
+  .schedule-table th, .schedule-table td { padding: 6px 8px; }
+}
+
+/* --- Contact page --- */
+.contact-map {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Support/donate hero section (O-nas page) --- */
+.support-hero {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 4rem calc(50vw - 50%);
+  margin-top: 3rem;
+  overflow: hidden;
+}
+
+.support-hero .hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.support-hero .hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.support-hero .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(234, 232, 228, 0.80);
+  z-index: 1;
+}
+
+.support-hero .hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* --- Footer --- */
+.site-footer {
+  background: #eae8e4;
+  padding: 40px 24px;
+  text-align: center;
+  margin: 0;
+  border-radius: 0;
+  color: #000;
+}
+
+.site-footer p {
+  font-size: 15px;
+  margin: 4px 0;
+}
+
+.site-footer a {
+  color: #000;
+}
+
+.footer-links {
+  margin-top: 20px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: #666;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* --- Utility --- */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
