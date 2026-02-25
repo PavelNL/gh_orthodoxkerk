@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="shortcut icon" type="image/png" href="../img/favicon.png">
+  <title>Tech Manuals</title>
+  <link href="../css/pico.min.css" rel="stylesheet">
+  <link href="../css/custom.css" rel="stylesheet">
+  <link href="../fonts/fonts.css" rel="stylesheet">
+  <style>
+    .manual-list { list-style: none; padding: 0; }
+    .manual-list li { margin-bottom: .75rem; }
+    .manual-list a { text-decoration: none; }
+    .manual-list a:hover { text-decoration: underline; }
+    .tag { font-size: .75rem; padding: .15em .5em; border-radius: 4px; margin-left: .5rem; vertical-align: middle; }
+    .tag-howto { background: #d1fae5; color: #065f46; }
+    .tag-reference { background: #dbeafe; color: #1e40af; }
+    .tag-guide { background: #fef3c7; color: #92400e; }
+  </style>
+</head>
+<body>
+  <main class="container" style="max-width: 800px; margin-top: 3rem;">
+    <hgroup>
+      <h1>Tech Manuals</h1>
+      <p>Internal technical documentation &mdash; not for public distribution.</p>
+    </hgroup>
+    <hr>
+    <ol class="manual-list">
+      <li><a href="01-dns-hosts-file.md">HOWTO configure DNS to Dev-Test servers using HOSTS file</a> <span class="tag tag-howto">howto</span></li>
+      <li><a href="02-ssl-local-dev.md">HOWTO set up self-signed SSL certificates for local development</a> <span class="tag tag-howto">howto</span></li>
+      <li><a href="03-git-branching-model.md">Git branching model and release workflow</a> <span class="tag tag-reference">reference</span></li>
+      <li><a href="04-docker-compose-setup.md">Getting started with Docker Compose for the project stack</a> <span class="tag tag-guide">guide</span></li>
+      <li><a href="05-nginx-reverse-proxy.md">DUMMY — Nginx reverse proxy</a> <span class="tag tag-reference">dummy</span></li>
+      <li><a href="06-backup-restore.md">DUMMY — Backup and restore procedures</a> <span class="tag tag-reference">dummy</span></li>
+      <li><a href="07-ssh-key-management.md">DUMMY — SSH key management</a> <span class="tag tag-reference">dummy</span></li>
+      <li><a href="08-ci-cd-pipeline.md">DUMMY — CI/CD pipeline</a> <span class="tag tag-reference">dummy</span></li>
+      <li><a href="09-monitoring-alerts.md">DUMMY — Monitoring and alerting</a> <span class="tag tag-reference">dummy</span></li>
+      <li><a href="10-firewall-rules.md">DUMMY — Firewall rules and port forwarding</a> <span class="tag tag-reference">dummy</span></li>
+    </ol>
+  </main>
+</body>
+</html>
