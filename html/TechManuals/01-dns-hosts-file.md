@@ -44,8 +44,7 @@ sudo nano /etc/hosts
 Append a line in the format `<IP>  <hostname>`:
 
 ```
-192.168.10.50   dev.example.local
-192.168.10.51   staging.example.local
+136.244.100.211   orthodoxkerk.dev
 ```
 
 - Use **spaces or tabs** between the IP and hostname.
@@ -95,7 +94,6 @@ nslookup dev.example.local
 
 Simply delete or comment out the lines you added and flush the cache again.
 
-## Related manuals
+## External references
 
-- [02 — Self-signed SSL certificates](02-ssl-local-dev.md)
-- [05 — Nginx reverse proxy](05-nginx-reverse-proxy.md)
+- [How to edit the hosts file](https://informatecdigital.com/en/how-to-edit-the-hosts-file/) — detailed walkthrough with screenshots
