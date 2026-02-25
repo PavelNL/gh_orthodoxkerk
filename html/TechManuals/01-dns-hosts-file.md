@@ -14,7 +14,7 @@ When developing or testing against internal servers that do not have public DNS 
 
 - Administrator / root access on your workstation
 - The IP address of the target Dev or Test server
-- The hostname you want to map (e.g. `dev.example.local`)
+- The hostname you want to map (e.g. `orthodoxkerk.dev`)
 
 ## Locating the hosts file
 
@@ -76,9 +76,9 @@ sudo systemd-resolve --flush-caches
 ### 5. Verify the resolution
 
 ```bash
-ping dev.example.local
+ping orthodoxkerk.dev
 # or
-nslookup dev.example.local
+nslookup orthodoxkerk.dev
 ```
 
 > **Note:** `nslookup` may bypass the hosts file on some systems. Use `ping` or `getent hosts` on Linux for a reliable check.
