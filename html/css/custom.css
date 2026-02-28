@@ -461,9 +461,8 @@ main {
 
 /* --- Schedule table --- */
 .schedule-section {
-  max-width: 960px;
   margin: 0 auto;
-  padding: 20px 24px 60px;
+  padding: 20px 0 60px;
 }
 
 /* Month header (e.g. "Февраль-2025") */
@@ -535,11 +534,14 @@ main {
   font-weight: 300;
 }
 
-/* Bold text inside cells (feast days, important events) */
-.schedule-table td strong {
-  font-weight: 500;
-  color: #000;
-}
+/* Inline markup attributes: [b:], [i:], [gold:], etc. — composable via multiple classes */
+.sch-b    { font-weight: 500; }
+.sch-i    { font-style: italic; }
+.sch-gold { color: #9a7200; }
+.sch-red  { color: #c62828; }
+.sch-green { color: #2e7d32; }
+.sch-blue  { color: #1565c0; }
+.sch-grey  { color: #757575; }
 
 .schedule-table tr:last-child td {
   border-bottom: none;
@@ -548,7 +550,7 @@ main {
 .schedule-table td:first-child { white-space: nowrap; width: 40px; text-align: center; font-weight: 500; color: #000; }
 .schedule-table td:nth-child(2) { white-space: nowrap; width: 110px; }
 .schedule-table td:nth-child(4) { white-space: nowrap; width: 90px; }
-.schedule-table td:nth-child(5) { white-space: nowrap; width: 120px; }
+.schedule-table td:nth-child(5) { width: 80px; }
 
 /* PicoCSS resets for schedule table rows */
 .schedule-table tbody tr {
