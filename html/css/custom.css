@@ -534,9 +534,18 @@ main {
   font-weight: 300;
 }
 
-/* Inline markup attributes: [b:], [i:], [gold:], etc. — composable via multiple classes */
+/* Inline markup attributes: [b:], [i:], [x1:], [gold:], etc. — composable via multiple classes */
 .sch-b    { font-weight: 500; }
 .sch-i    { font-style: italic; }
+.sch-x0   { font-size: 1em; }
+.sch-x1   { font-size: calc(1em + 1pt); }
+.sch-x2   { font-size: calc(1em + 2pt); }
+.sch-x3   { font-size: calc(1em + 3pt); }
+.sch-x4   { font-size: calc(1em + 4pt); }
+.sch-x5   { font-size: calc(1em + 5pt); }
+.sch-x6   { font-size: calc(1em + 6pt); }
+.sch-x7   { font-size: calc(1em + 7pt); }
+.sch-x8   { font-size: calc(1em + 8pt); }
 .sch-gold { color: #9a7200; }
 .sch-red  { color: #c62828; }
 .sch-green { color: #2e7d32; }
