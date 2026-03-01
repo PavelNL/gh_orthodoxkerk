@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="shortcut icon" type="image/png" href="../img/favicon.png">
+  <title>Schedule Converter | TechManuals</title>
+  <link href="../css/pico.min.css" rel="stylesheet">
+  <link href="../css/custom.css" rel="stylesheet">
+  <link href="../fonts/fonts.css" rel="stylesheet">
+  <style>
+    body { padding-top: 0; }
+    main { padding-top: 2rem !important; }
+    .tool-box {
+      background: #fff;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .controls label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; font-weight: 500; }
+    .controls label input { font-size: 0.82rem; padding: 0.35rem 0.5rem; margin: 0; }
+    .controls .f-file  { flex: 3; min-width: 200px; }
+    .controls .f-month { flex: 1; min-width: 110px; }
+    .controls .f-year  { width: 80px; }
+    .controls button   { margin: 0; padding: 0.45rem 1.4rem; font-size: 0.82rem; white-space: nowrap; }
+    #status { font-size: 0.82rem; display: block; margin-top: 0.6rem; min-height: 1.2em; }
+    .ok  { color: #2e7d32; }
+    .err { color: #c62828; }
+    .out-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+    .out-header strong { font-size: 0.85rem; }
+    .out-header button { margin: 0; padding: 0.3rem 1rem; font-size: 0.78rem; }
+    #csvOutput {
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      width: 100%;
+      min-height: 420px;
+      resize: vertical;
+      white-space: pre;
+      overflow-x: auto;
+      border: 1px solid #ccc;
+      padding: 0.6rem;
+      background: #fafaf8;
+      color: #111;
+    }
+    .note { font-size: 0.78rem; color: #666; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+<main class="container" style="max-width: 960px; padding-bottom: 4rem;">
+
+  <hgroup style="margin-bottom: 1.5rem;">
+    <h2>Word → Schedule CSV Converter</h2>
+    <p>Converts a Word-exported schedule file (.html or .rtf) to the raspisanie CSV format.</p>
+  </hgroup>
+
+  <div class="tool-box">
+    <div class="controls">
+      <label class="f-file">
+        File (.html / .rtf)
+        <input type="file" id="fileInput" accept=".html,.htm,.rtf">
+      </label>
+      <label class="f-month">
+        Month name
+        <input type="text" id="monthInput" placeholder="e.g. Март">
+      </label>
+      <label class="f-year">
+        Year
+        <input type="number" id="yearInput" value="2026" min="2020" max="2099">
+      </label>
+      <button onclick="convert()">Convert</button>
+    </div>
+    <span id="status"></span>
+    <p class="note">
+      HTML: bold, italic and colour are converted to markup. &nbsp;|&nbsp;
+      RTF: Unicode (Cyrillic) decoded; bold, italic, basic colours preserved.
+      Month name is auto-detected from the file when possible.
+    </p>
+  </div>
+
+  <div class="tool-box" id="outputBox" style="display:none;">
+    <div class="out-header">
+      <strong>CSV output — paste into raspisanie/index.html</strong>
+      <button onclick="copyOutput()">Copy</button>
+    </div>
+    <textarea id="csvOutput" readonly spellcheck="false"></textarea>
+  </div>
+
+</main>
+<script>
+// =============================================================================
+// Entry point
+// =============================================================================
+
+function convert() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) { setStatus('Please select a file.', true); return; }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const text    = e.target.result;
+      const month   = document.getElementById('monthInput').value.trim();
+      const year    = document.getElementById('yearInput').value.trim();
+      const isRtf   = file.name.toLowerCase().endsWith('.rtf');
+      const csv     = isRtf ? parseRtf(text, month, year) : parseHtml(text, month, year);
+      const dataRows = csv.split('\n').filter(l => l && !l.startsWith('#') && !l.startsWith('/')).length;
+      document.getElementById('csvOutput').value = csv;
+      document.getElementById('outputBox').style.display = '';
+      setStatus('Done — ' + dataRows + ' data rows converted.', false);
+    } catch (err) {
+      setStatus('Error: ' + err.message, true);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function copyOutput() {
+  const ta = document.getElementById('csvOutput');
+  ta.select();
+  document.execCommand('copy');
+  setStatus('Copied to clipboard.', false);
+}
+
+function setStatus(msg, isError) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className   = isError ? 'err' : 'ok';
+}
+
+function setMonth(name) {
+  const el = document.getElementById('monthInput');
+  if (!el.value) el.value = name;
+}
+
+// =============================================================================
+// HTML parser  (Word "Save as Web Page, Filtered")
+// =============================================================================
+
+function parseHtml(htmlText, monthOverride, year) {
+  const doc   = new DOMParser().parseFromString(htmlText, 'text/html');
+  const table = doc.querySelector('table');
+  if (!table) throw new Error('No <table> found in HTML file.');
+
+  const rows = table.querySelectorAll('tr');
+  if (!rows.length) throw new Error('Table has no rows.');
+
+  // Month name from first row, 3rd cell (index 2)
+  let monthName = monthOverride;
+  if (!monthName) {
+    const cells = rows[0].querySelectorAll('td');
+    if (cells.length >= 3) {
+      const img = cells[2].querySelector('img');
+      monthName  = img
+        ? (img.getAttribute('alt') || '').replace(/\s+/g, '')
+        : htmlCellText(cells[2]).replace(/\[.*?:|\]/g, '').trim();
+    }
+    monthName = monthName || '???';
+  }
+  setMonth(monthName);
+
+  let out = '## Month: ' + monthName + '-' + year + '\n';
+
+  for (let i = 1; i < rows.length; i++) {
+    const cells = rows[i].querySelectorAll('td');
+    if (cells.length < 5) continue;
+
+    const fields = [];
+    for (let j = 0; j < 5; j++) fields.push(htmlCellText(cells[j]));
+    if (fields.every(f => !f)) continue;
+
+    out += rowToCsv(fields) + '\n';
+  }
+  return out;
+}
+
+// Extract text+markup from a <td>, joining multiple <p> with [br]
+function htmlCellText(cell) {
+  const paras = cell.querySelectorAll('p');
+  if (!paras.length) return htmlNode(cell, new Set()).trim();
+  return Array.from(paras)
+    .map(p => htmlNode(p, new Set()).trim())
+    .filter(t => t && t !== '\u00a0')
+    .join('[br]');
+}
+
+// Recursive node → markup converter, accumulating attrs down the tree
+function htmlNode(node, attrs) {
+  if (node.nodeType === 3) {                                    // text node
+    const t = node.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!t) return '';
+    return attrs.size ? '[' + [...attrs].join(',') + ':' + t + ']' : t;
+  }
+  if (node.nodeType !== 1) return '';
+
+  const tag = node.tagName.toLowerCase();
+  if (['script','style','head'].includes(tag)) return '';
+  if (tag === 'br') return '[br]';
+  if (tag === 'img') return (node.getAttribute('alt') || '').replace(/\s+/g, '');
+
+  const a = new Set(attrs);
+  if (tag === 'b' || tag === 'strong') a.add('b');
+  if (tag === 'i' || tag === 'em')     a.add('i');
+
+  const style = node.getAttribute('style') || '';
+  const cm    = style.match(/\bcolor\s*:\s*([^;'"]+)/i);
+  if (cm) {
+    const colorMap = {
+      red: 'red',  blue: 'blue', green: 'green', gold: 'gold',
+      gray: 'grey', grey: 'grey', maroon: 'red', navy: 'blue',
+      '#ff0000': 'red', '#0000ff': 'blue', '#008000': 'green',
+      '#ffa500': 'gold',
+    };
+    const c = colorMap[cm[1].trim().toLowerCase()];
+    if (c) a.add(c);
+  }
+
+  return Array.from(node.childNodes).map(n => htmlNode(n, a)).join('');
+}
+
+// =============================================================================
+// RTF parser  (state machine)
+// =============================================================================
+
+function parseRtf(rtf, monthOverride, year) {
+  const colorTable = rtfColorTable(rtf);
+  const rows       = rtfRows(rtf, colorTable);
+  if (!rows.length) throw new Error('No table rows found in RTF file.');
+
+  // Month name: first row, 3rd cell (index 2)
+  let monthName = monthOverride;
+  if (!monthName && rows[0].length >= 3) {
+    monthName = segsToText(rows[0][2]).replace(/\s{2,}/g, ' ').trim();
+  }
+  monthName = monthName || '???';
+  setMonth(monthName);
+
+  let out = '## Month: ' + monthName + '-' + year + '\n';
+
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i].length < 5) continue;
+    const fields = rows[i].slice(0, 5).map(segsToMarkup);
+    if (fields.every(f => !f)) continue;
+    out += rowToCsv(fields) + '\n';
+  }
+  return out;
+}
+
+// Parse {\colortbl ...} and return index → color-name map
+function rtfColorTable(rtf) {
+  const start = rtf.indexOf('{\\colortbl');
+  if (start === -1) return {};
+  let depth = 1, pos = start + 1;
+  while (pos < rtf.length && depth > 0) {
+    const ch = rtf[pos];
+    if (ch === '\\') pos++;          // skip escaped char
+    else if (ch === '{') depth++;
+    else if (ch === '}') depth--;
+    pos++;
+  }
+  const block = rtf.slice(start, pos);
+  const map = {};
+  let idx = 1;
+  for (const entry of block.split(';')) {
+    const r = entry.match(/\\red(\d+)/),
+          g = entry.match(/\\green(\d+)/),
+          b = entry.match(/\\blue(\d+)/);
+    if (r && g && b) {
+      const [rv, gv, bv] = [+r[1], +g[1], +b[1]];
+      let name = null;
+      if (rv > 180 && gv <  80 && bv <  80) name = 'red';
+      if (rv <  80 && gv <  80 && bv > 180) name = 'blue';
+      if (rv <  80 && gv > 120 && bv <  80) name = 'green';
+      if (rv > 150 && gv > 100 && bv <  60) name = 'gold';
+      map[idx++] = name;
+    }
+  }
+  return map;
+}
+
+// State-machine RTF → array of rows, each row = array of cell segments
+// Segment: { text: string, bold: bool, italic: bool, color: string|null }
+function rtfRows(rtf, colorTable) {
+  const rows  = [];
+  let curRow  = [];
+  let curSegs = [];
+  let curText = '';
+
+  // Formatting state with stack for {} groups
+  const stack = [];
+  let bold    = false;
+  let italic  = false;
+  let color   = null;
+  let skipD   = 0;   // skip depth for unwanted groups
+
+  function pushState()  { stack.push({ bold, italic, color }); }
+  function popState()   { const s = stack.pop() || {}; bold = !!s.bold; italic = !!s.italic; color = s.color || null; }
+  function flush() {
+    if (!curText) return;
+    curSegs.push({ text: curText, bold, italic, color });
+    curText = '';
+  }
+
+  let pos = 0, len = rtf.length;
+
+  while (pos < len) {
+    // ── skip-group fast path ───────────────────────────────────────────────
+    if (skipD > 0) {
+      const ch = rtf[pos];
+      if (ch === '\\' && pos + 1 < len) { pos += 2; continue; } // skip escaped char
+      if (ch === '{') skipD++;
+      else if (ch === '}') { skipD--; if (skipD === 0) popState(); }
+      pos++;
+      continue;
+    }
+
+    const ch = rtf[pos];
+
+    // ── group open ─────────────────────────────────────────────────────────
+    if (ch === '{') {
+      pushState();
+      pos++;
+      // Check if this group should be skipped entirely
+      const peek = rtf.slice(pos, pos + 32);
+      if (/^\\(\*|pict|fonttbl|stylesheet|latentstyles|themedata|colorschememapping|datastore|rsidtbl|mmathPr|info|shp|sp\b)/.test(peek)) {
+        skipD = 1;
+      }
+      continue;
+    }
+
+    // ── group close ────────────────────────────────────────────────────────
+    if (ch === '}') {
+      flush();
+      popState();
+      pos++;
+      continue;
+    }
+
+    // ── control word / symbol ──────────────────────────────────────────────
+    if (ch === '\\') {
+      pos++;
+      if (pos >= len) break;
+      const nc = rtf[pos];
+
+      // Encoded character \'XX (cp1252)
+      if (nc === "'" && pos + 2 < len) {
+        const code = parseInt(rtf.slice(pos + 1, pos + 3), 16);
+        // cp1252 special range 0x80-0x9F
+        const cp1252extra = [8364,0,8218,402,8222,8230,8224,8225,710,8240,
+                             352,8249,338,0,381,0,0,8216,8217,8220,8221,
+                             8226,8211,8212,732,8482,353,8250,339,0,382,376];
+        const uc = (code >= 0x80 && code <= 0x9F) ? (cp1252extra[code - 0x80] || code) : code;
+        curText += String.fromCharCode(uc);
+        pos += 3;
+        continue;
+      }
+
+      // Escaped literal
+      if (nc === '{' || nc === '}' || nc === '\\') { curText += nc; pos++; continue; }
+
+      // Ignored escaped whitespace
+      if (nc === '\n' || nc === '\r' || nc === '~' || nc === '-' || nc === '_') { pos++; continue; }
+
+      // Control word
+      if (/[a-zA-Z]/.test(nc)) {
+        let word = '';
+        while (pos < len && /[a-zA-Z]/.test(rtf[pos])) word += rtf[pos++];
+        let numStr = '';
+        if (pos < len && rtf[pos] === '-') { numStr = '-'; pos++; }
+        while (pos < len && /[0-9]/.test(rtf[pos])) numStr += rtf[pos++];
+        if (pos < len && rtf[pos] === ' ')  pos++;   // consume delimiter space
+        const n = numStr !== '' ? parseInt(numStr) : null;
+
+        flush(); // flush text before changing state
+
+        switch (word) {
+          case 'b':    bold   = (n !== 0);  break;
+          case 'i':    italic = (n !== 0);  break;
+          case 'cf':   color  = n ? (colorTable[n] || null) : null; break;
+          case 'u':
+            if (n !== null) {
+              curText += String.fromCharCode(n < 0 ? n + 65536 : n);
+              // skip RTF fallback character(s)
+              if (pos < len && rtf[pos] === '?')            pos++;
+              else if (pos < len && rtf[pos] === '\\' && rtf[pos+1] === "'") pos += 4;
+            }
+            break;
+          case 'par':
+          case 'line':  curText += '\n'; break;
+          case 'tab':   curText += '\t'; break;
+          case 'cell':
+            flush();
+            curRow.push(curSegs);
+            curSegs = [];
+            break;
+          case 'row':
+            flush();
+            if (curSegs.length) { curRow.push(curSegs); curSegs = []; }
+            if (curRow.length)  { rows.push(curRow);    curRow  = []; }
+            break;
+          // reset formatting on \plain or \pard
+          case 'plain': bold = false; italic = false; color = null; break;
+          // silently ignore all other control words
+        }
+        continue;
+      }
+      // Unknown \X — skip
+      pos++;
+      continue;
+    }
+
+    // ── plain text ─────────────────────────────────────────────────────────
+    if (ch !== '\n' && ch !== '\r') curText += ch;
+    pos++;
+  }
+
+  return rows;
+}
+
+// Segments → plain text (for month name extraction)
+function segsToText(segs) {
+  return (segs || []).map(s => s.text).join(' ').replace(/\n/g, ' ').trim();
+}
+
+// Segments → our markup format  e.g. [b,red:text]
+function segsToMarkup(segs) {
+  if (!segs || !segs.length) return '';
+
+  // Expand \n within segments into explicit break markers
+  const expanded = [];
+  for (const s of segs) {
+    const parts = s.text.split('\n');
+    for (let k = 0; k < parts.length; k++) {
+      if (k > 0) expanded.push({ text: '\n', bold: false, italic: false, color: null });
+      const t = parts[k].replace(/\s+/g, ' ').trim();
+      if (t) expanded.push({ ...s, text: t });
+    }
+  }
+
+  // Merge consecutive segments with identical formatting
+  const merged = [];
+  for (const s of expanded) {
+    if (s.text === '\n') { merged.push(s); continue; }
+    const last = merged[merged.length - 1];
+    if (last && last.text !== '\n' &&
+        last.bold   === s.bold   &&
+        last.italic === s.italic &&
+        last.color  === s.color) {
+      last.text += ' ' + s.text;
+    } else {
+      merged.push({ ...s });
+    }
+  }
+
+  return merged.map(s => {
+    if (s.text === '\n') return '[br]';
+    const attrs = [];
+    if (s.bold)   attrs.push('b');
+    if (s.italic) attrs.push('i');
+    if (s.color)  attrs.push(s.color);
+    return attrs.length ? '[' + attrs.join(',') + ':' + s.text + ']' : s.text;
+  }).join('');
+}
+
+// =============================================================================
+// Shared helper
+// =============================================================================
+
+// Convert 5 fields to one CSV row.
+// Field 0 (day number) is unquoted when it is a plain integer.
+function rowToCsv(fields) {
+  const day   = fields[0];
+  const isNum = /^\d+$/.test(day);
+  return fields.map((f, i) => (i === 0 && isNum) ? day : "'" + f + "'").join(',');
+}
+</script>
+</body>
+</html>
