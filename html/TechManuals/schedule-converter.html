@@ -191,11 +191,19 @@ function parseHtml(htmlText, monthOverride, year) {
 // Extract text+markup from a <td>, joining multiple <p> with [br]
 function htmlCellText(cell) {
   const paras = cell.querySelectorAll('p');
-  if (!paras.length) return htmlNode(cell, new Set()).trim();
+  if (!paras.length) return mergeSpans(htmlNode(cell, new Set()).trim());
   return Array.from(paras)
-    .map(p => htmlNode(p, new Set()).trim())
+    .map(p => mergeSpans(htmlNode(p, new Set()).trim()))
     .filter(t => t && t !== '\u00a0')
     .join('[br]');
+}
+
+// Merge consecutive identical-attrs spans: [a,b:x][a,b:y] → [a,b:xy]
+function mergeSpans(s) {
+  let prev;
+  do { prev = s; s = s.replace(/\[([a-z0-9,]+):([^\]]*)\]\[\1:/g, '[$1:$2'); }
+  while (s !== prev);
+  return s;
 }
 
 // Map a CSS color value (named or hex) to a sch-* class name, or null.
@@ -236,9 +244,10 @@ function resolveColor(raw) {
 // Recursive node → markup converter, accumulating attrs down the tree
 function htmlNode(node, attrs) {
   if (node.nodeType === 3) {                                    // text node
-    const t = node.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!t) return '';
-    return attrs.size ? '[' + [...attrs].join(',') + ':' + t + ']' : t;
+    const t = node.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ');
+    if (!t.trim()) return '';
+    // sort attrs for consistent key order (required for mergeSpans backreference)
+    return attrs.size ? '[' + [...attrs].sort().join(',') + ':' + t + ']' : t;
   }
   if (node.nodeType !== 1) return '';
 
