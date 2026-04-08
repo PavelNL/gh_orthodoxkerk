@@ -233,6 +233,21 @@ h1 strong, h2 strong, h3 strong {
   font-size: 0.8rem;
 }
 
+/* ── Language switcher ───────────────────────────────────────────────── */
+.lang-switcher .lang-current {
+  font-size: 1.25rem;
+  letter-spacing: -0.05em;
+  padding: 2px 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+.lang-switcher .lang-menu { min-width: 155px; }
+.lang-switcher .lang-active {
+  font-weight: 700;
+  pointer-events: none;
+}
+
 /* Mobile hamburger */
 .nav-toggle {
   display: none;
