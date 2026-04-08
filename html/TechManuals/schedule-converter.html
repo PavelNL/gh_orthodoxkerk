@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="shortcut icon" type="image/png" href="../img/favicon.png">
+  <title>Schedule Converter | TechManuals</title>
+  <link href="../css/pico.min.css" rel="stylesheet">
+  <link href="../css/custom.css" rel="stylesheet">
+  <link href="../fonts/fonts.css" rel="stylesheet">
+  <style>
+    body { padding-top: 0; }
+    main { padding-top: 2rem !important; }
+    .tool-box {
+      background: #fff;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .controls label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; font-weight: 500; }
+    .controls label input { font-size: 0.82rem; padding: 0.35rem 0.5rem; margin: 0; }
+    .controls .f-file  { flex: 3; min-width: 200px; }
+    .controls .f-month { flex: 1; min-width: 110px; }
+    .controls .f-year  { width: 80px; }
+    .controls button   { margin: 0; padding: 0.45rem 1.4rem; font-size: 0.82rem; white-space: nowrap; }
+    #status { font-size: 0.82rem; display: block; margin-top: 0.6rem; min-height: 1.2em; }
+    .ok  { color: #2e7d32; }
+    .err { color: #c62828; }
+    .out-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+    .out-header strong { font-size: 0.85rem; }
+    .out-header button { margin: 0; padding: 0.3rem 1rem; font-size: 0.78rem; }
+    #csvOutput {
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      width: 100%;
+      min-height: 420px;
+      resize: vertical;
+      white-space: pre;
+      overflow-x: auto;
+      border: 1px solid #ccc;
+      padding: 0.6rem;
+      background: #fafaf8;
+      color: #111;
+    }
+    .note { font-size: 0.78rem; color: #666; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+<main class="container" style="max-width: 960px; padding-bottom: 4rem;">
+
+  <hgroup style="margin-bottom: 1.5rem;">
+    <h2>Word → Schedule CSV Converter</h2>
+    <p>Converts a Word-exported schedule HTML file to the raspisanie CSV format.</p>
+  </hgroup>
+
+  <div class="tool-box">
+    <div class="controls">
+      <label class="f-file">
+        File (.html)
+        <input type="file" id="fileInput" accept=".html,.htm">
+      </label>
+      <label class="f-month">
+        Month name
+        <input type="text" id="monthInput" placeholder="e.g. Март">
+      </label>
+      <label class="f-year">
+        Year
+        <input type="number" id="yearInput" value="2026" min="2020" max="2099">
+      </label>
+      <button onclick="convert()">Convert</button>
+    </div>
+    <span id="status"></span>
+    <p class="note">Bold, italic and colour are converted to markup. Month name is auto-detected from the file when possible.</p>
+  </div>
+
+  <div class="tool-box" id="outputBox" style="display:none;">
+    <div class="out-header">
+      <strong>CSV output — paste into raspisanie/index.html</strong>
+      <button onclick="copyOutput()">Copy</button>
+    </div>
+    <textarea id="csvOutput" readonly spellcheck="false"></textarea>
+  </div>
+
+</main>
+<script>
+// =============================================================================
+// Entry point
+// =============================================================================
+
+function convert() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) { setStatus('Please select a file.', true); return; }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      // Auto-detect encoding via BOM
+      const buf   = e.target.result;
+      const bytes = new Uint8Array(buf);
+      let encoding = 'utf-8';
+      if (bytes[0] === 0xFF && bytes[1] === 0xFE) encoding = 'utf-16le';
+      else if (bytes[0] === 0xFE && bytes[1] === 0xFF) encoding = 'utf-16be';
+      const text  = new TextDecoder(encoding).decode(buf);
+
+      const month   = document.getElementById('monthInput').value.trim();
+      const year    = document.getElementById('yearInput').value.trim();
+      const csv     = parseHtml(text, month, year);
+      const dataRows = csv.split('\n').filter(l => l && !l.startsWith('#') && !l.startsWith('/')).length;
+      document.getElementById('csvOutput').value = csv;
+      document.getElementById('outputBox').style.display = '';
+      setStatus('Done [' + encoding + '] — ' + dataRows + ' data rows converted.', false);
+    } catch (err) {
+      setStatus('Error: ' + err.message, true);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function copyOutput() {
+  const ta = document.getElementById('csvOutput');
+  ta.select();
+  document.execCommand('copy');
+  setStatus('Copied to clipboard.', false);
+}
+
+function setStatus(msg, isError) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className   = isError ? 'err' : 'ok';
+}
+
+function setMonth(name) {
+  const el = document.getElementById('monthInput');
+  if (!el.value) el.value = name;
+}
+
+// =============================================================================
+// HTML parser  (Word "Save as Web Page, Filtered")
+// =============================================================================
+
+function parseHtml(htmlText, monthOverride, year) {
+  const doc   = new DOMParser().parseFromString(htmlText, 'text/html');
+  const table = doc.querySelector('table');
+  if (!table) throw new Error('No <table> found in HTML file.');
+
+  const rows = table.querySelectorAll('tr');
+  if (!rows.length) throw new Error('Table has no rows.');
+
+  // Month name from first row, 3rd cell (index 2)
+  let monthName = monthOverride;
+  if (!monthName) {
+    const cells = rows[0].querySelectorAll('td');
+    if (cells.length >= 3) {
+      const img = cells[2].querySelector('img');
+      monthName  = img
+        ? (img.getAttribute('alt') || '').replace(/\s+/g, '')
+        : htmlCellText(cells[2]).replace(/\[.*?:|\]/g, '').trim();
+    }
+    monthName = monthName || '???';
+  }
+  setMonth(monthName);
+
+  let out = '## Month: ' + monthName + '-' + year + '\n';
+
+  for (let i = 1; i < rows.length; i++) {
+    const cells = rows[i].querySelectorAll('td');
+    if (cells.length < 5) continue;
+
+    const fields = [];
+    for (let j = 0; j < 5; j++) fields.push(htmlCellText(cells[j]));
+    if (fields.every(f => !f)) continue;
+
+    out += rowToCsv(fields) + '\n';
+  }
+  return out;
+}
+
+// Extract text+markup from a <td>, joining multiple <p> with [br]
+function htmlCellText(cell) {
+  const paras = cell.querySelectorAll('p');
+  if (!paras.length) return mergeSpans(htmlNode(cell, new Set()).trim());
+  return Array.from(paras)
+    .map(p => mergeSpans(htmlNode(p, new Set()).trim()))
+    .filter(t => t && t !== '\u00a0')
+    .join('[br]');
+}
+
+// Merge consecutive identical-attrs spans: [a,b:x][a,b:y] → [a,b:xy]
+function mergeSpans(s) {
+  let prev;
+  do { prev = s; s = s.replace(/\[([a-z0-9,]+):([^\]]*)\]\[\1:/g, '[$1:$2'); }
+  while (s !== prev);
+  return s;
+}
+
+// Map a CSS color value (named or hex) to a sch-* class name, or null.
+function resolveColor(raw) {
+  const s = raw.toLowerCase().replace(/\s/g, '');
+  const named = {
+    red:'red', blue:'blue', green:'green', gold:'gold', yellow:'gold',
+    gray:'grey', grey:'grey', silver:'grey', black:null, white:null,
+    maroon:'red', crimson:'red', firebrick:'red', darkred:'red',
+    navy:'blue', darkblue:'blue', royalblue:'blue',
+    darkgreen:'green', olive:'green', teal:'green',
+    orange:'gold', darkorange:'gold', goldenrod:'gold', darkgoldenrod:'gold',
+  };
+  if (s in named) return named[s];
+
+  // Hex #rrggbb or #rgb
+  let m = s.match(/^#([0-9a-f]{6})$/);
+  if (!m) { const m3 = s.match(/^#([0-9a-f]{3})$/); if (m3) m = ['', m3[1].replace(/(.)/g,'$1$1')]; }
+  if (m) {
+    const r = parseInt(m[1].slice(0,2), 16);
+    const g = parseInt(m[1].slice(2,4), 16);
+    const b = parseInt(m[1].slice(4,6), 16);
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    if (max < 30)  return null;               // near black → no color
+    if (min > 200) return null;               // near white → no color
+    const spread = max - min;
+    if (spread < 40) return 'grey';           // low saturation → grey
+    // dominant channel
+    if (r === max && r > g + 40 && r > b + 40) return 'red';
+    if (g === max && g > r + 20 && g > b + 20) return 'green';
+    if (b === max && b > r + 40 && b > g + 40) return 'blue';
+    if (r === max && g > b + 20)               return 'gold'; // red+green dominant → yellow/gold
+  }
+  return null;
+}
+
+// Recursive node → markup converter, accumulating attrs down the tree
+function htmlNode(node, attrs) {
+  if (node.nodeType === 3) {                                    // text node
+    const t = node.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ');
+    if (!t.trim()) return '';
+    // sort attrs for consistent key order (required for mergeSpans backreference)
+    return attrs.size ? '[' + [...attrs].sort().join(',') + ':' + t + ']' : t;
+  }
+  if (node.nodeType !== 1) return '';
+
+  const tag = node.tagName.toLowerCase();
+  if (['script','style','head'].includes(tag)) return '';
+  if (tag === 'br') return '[br]';
+  if (tag === 'img') return (node.getAttribute('alt') || '').replace(/\s+/g, '');
+
+  const a = new Set(attrs);
+  if (tag === 'b' || tag === 'strong') a.add('b');
+  if (tag === 'i' || tag === 'em')     a.add('i');
+
+  const style = node.getAttribute('style') || '';
+
+  // Color detection
+  const cm = style.match(/\bcolor\s*:\s*([^;'"]+)/i);
+  if (cm) {
+    const c = resolveColor(cm[1].trim());
+    if (c) a.add(c);
+  }
+
+  // Font-size detection: base = 12pt; sizes > 12pt → x1..x8
+  const fm = style.match(/\bfont-size\s*:\s*([\d.]+)pt/i);
+  if (fm) {
+    const step = Math.round(parseFloat(fm[1]) - 12);
+    if (step > 0) a.add('x' + Math.min(step, 8));
+  }
+
+  return Array.from(node.childNodes).map(n => htmlNode(n, a)).join('');
+}
+
+// Convert 5 fields to one CSV row.
+// Field 0 (day number) is unquoted when it is a plain integer.
+function rowToCsv(fields) {
+  const day   = fields[0];
+  const isNum = /^\d+$/.test(day);
+  return fields.map((f, i) => (i === 0 && isNum) ? day : "'" + f + "'").join(',');
+}
+</script>
+</body>
+</html>
