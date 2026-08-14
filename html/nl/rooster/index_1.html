@@ -11,11 +11,7 @@
   <link href="../../fonts/fonts.css" rel="stylesheet">
   <style>
     .schedule-month-block > summary { cursor: pointer; }
-    .schedule-month-block > summary > .schedule-month {
-      display: inline-block; margin: 0; vertical-align: middle;
-      font-size: 1rem; font-weight: 400; color: var(--pico-muted-color, #5f6b76);
-    }
-    .schedule-month__year { color: color-mix(in srgb, currentColor 65%, transparent); }
+    .schedule-month-block > summary > .schedule-month { display: inline-block; margin: 0; vertical-align: middle; }
   </style>
 </head>
 <body>
@@ -205,11 +201,7 @@ function renderSchedule(csv) {
       if (tableOpen) html += '</tbody></table></details>';
       const month = line.substring(9).trim();
       html += '<details class="schedule-month-block"' + (isCurrentMonth(month) ? ' open' : '') + '>';
-      const dash = month.indexOf('-');
-      html += '<summary><h3 class="schedule-month">'
-            + (dash > -1 ? month.slice(0, dash) : month)
-            + (dash > -1 ? '<span class="schedule-month__year">' + month.slice(dash) + '</span>' : '')
-            + '</h3></summary>';
+      html += '<summary><h2 class="schedule-month">' + month + '</h2></summary>';
       html += '<table class="schedule-table">' + TH;
       tableOpen = true;
       return;

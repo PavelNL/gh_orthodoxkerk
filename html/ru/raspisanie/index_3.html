@@ -9,14 +9,6 @@
   <link href="../../css/pico.min.css" rel="stylesheet">
   <link href="../../css/custom.css" rel="stylesheet">
   <link href="../../fonts/fonts.css" rel="stylesheet">
-  <style>
-    .schedule-month-block > summary { cursor: pointer; }
-    .schedule-month-block > summary > .schedule-month {
-      display: inline-block; margin: 0; vertical-align: middle;
-      font-size: 1rem; font-weight: 400; color: var(--pico-muted-color, #5f6b76);
-    }
-    .schedule-month__year { color: color-mix(in srgb, currentColor 65%, transparent); }
-  </style>
 </head>
 <body>
   <header class="site-header">
@@ -231,15 +223,6 @@
 28,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
 </script>
 <script>
-const RUSSIAN_MONTHS = ['январь','февраль','март','апрель','май','июнь',
-                        'июль','август','сентябрь','октябрь','ноябрь','декабрь'];
-
-function isCurrentMonth(label) {
-  const now = new Date();
-  return label.toLowerCase().replace(/\s+/g, '')
-    === RUSSIAN_MONTHS[now.getMonth()] + '-' + now.getFullYear();
-}
-
 function renderSchedule(csv) {
   const container = document.getElementById('schedule-container');
   let html = '';
@@ -251,14 +234,9 @@ function renderSchedule(csv) {
     if (!line) return;
 
     if (line.startsWith('## Month:')) {
-      if (tableOpen) html += '</tbody></table></details>';
+      if (tableOpen) html += '</tbody></table>';
       const month = line.substring(9).trim();
-      html += '<details class="schedule-month-block"' + (isCurrentMonth(month) ? ' open' : '') + '>';
-      const dash = month.indexOf('-');
-      html += '<summary><h3 class="schedule-month">'
-            + (dash > -1 ? month.slice(0, dash) : month)
-            + (dash > -1 ? '<span class="schedule-month__year">' + month.slice(dash) + '</span>' : '')
-            + '</h3></summary>';
+      html += '<h2 class="schedule-month">' + month + '</h2>';
       html += '<table class="schedule-table">' + TH;
       tableOpen = true;
       return;
@@ -297,13 +275,8 @@ function renderSchedule(csv) {
     }
   });
 
-  if (tableOpen) html += '</tbody></table></details>';
+  if (tableOpen) html += '</tbody></table>';
   container.innerHTML = html;
-
-  if (!container.querySelector('details[open]')) {
-    const first = container.querySelector('details');
-    if (first) first.open = true;
-  }
 }
 
 renderSchedule(document.getElementById('schedule-data').textContent);
