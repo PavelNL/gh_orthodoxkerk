@@ -5,10 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/png" href="../../img/favicon.png">
   <title>Schedule | orthodox kerk</title>
-  <meta name="description" content="Service schedule of the Church of the Holy Prince Alexander Nevsky in Rotterdam">
+  <meta name="description" content="Service schedules of the Church of the Holy Grand Prince Alexander Nevsky in Rotterdam">
   <link href="../../css/pico.min.css" rel="stylesheet">
   <link href="../../css/custom.css" rel="stylesheet">
   <link href="../../fonts/fonts.css" rel="stylesheet">
+  <style>
+    .schedule-month-block > summary { cursor: pointer; }
+    .schedule-month-block > summary > .schedule-month {
+      display: inline-block; margin: 0; vertical-align: middle;
+      font-size: 1rem; font-weight: 400; color: var(--pico-muted-color, #5f6b76);
+    }
+    .schedule-month__year { color: color-mix(in srgb, currentColor 65%, transparent); }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -25,11 +33,11 @@
           </ul>
         </li>
         <li class="has-children">
-          <a href="../">Home <span class="arrow">&#9662;</span></a>
+          <a href="../">Main menu <span class="arrow">&#9662;</span></a>
           <ul class="submenu">
             <li><a href="../news/">News</a></li>
             <li><a href="../events/">Events</a></li>
-            <li><a href="../sunday-school/">Sunday School</a></li>
+            <li><a href="../sunday-school/">Sunday school</a></li>
             <li><a href="../../history/2025_Stichting_Bouw_Russisch_Orthodoxe_Kerk_Rotterdam.pdf">ANBI</a></li>
           </ul>
         </li>
@@ -37,7 +45,7 @@
         <li><a href="../donations/">Donations</a></li>
         <li><a href="../gallery/">Gallery</a></li>
         <li><a href="../contact/">Contact</a></li>
-        <li><a href="../about/">About</a></li>
+        <li><a href="../about-us/">About us</a></li>
       </ul>
     </div>
   </header>
@@ -45,125 +53,163 @@
     <h2 class="text-center">Schedule</h2>
     <div id="schedule-container" class="schedule-section"></div>
 <script id="schedule-data" type="text/plain">
-## Month: Март-2026
-1,'Воскресенье','[b:Неделя 1-я Великого поста. ][b,i,red:Торжество Православия. ][i:Глас 5-ый.]','10:30','Литургия'
-2,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником.(о.Анатолий)]','10:00-15:00','Уборка'
-4,'Среда','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-6,'Пятница','[i:Храм Александра Невского открыт для молитвы.][br][b:Литургия Преждеосвященных Даров.]','11:00-15:00[br]18:30','Храм открыт[br]Литургия'
-7,'Суббота','Канун воскресного дня. Обретение мощей Блаженной Матроны Московской.','17:30','Всенощное бдение'
-8,'Воскресенье','[b:Неделя 2-я Великого поста.][i:Глас 6-ый.][br][b:Святителя Григория Паламы.]','10:30[br]14:00','Литургия Василия Великого[br]Крещение'
-9,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником.(о.Анатолий)]','10:00-15:00','Уборка'
-11,'Среда','[i:Храм Александра Невского открыт для молитвы.][br][b:Литургия Преждеосвященных Даров.]','11:00-15:00[br]18:30','Храм открыт[br]Литургия'
-13,'Пятница','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-14,'Суббота','[b:Поминовение усопших.][br]Канун воскресного дня.','14:00[br]17:30','[b:Панихида][br]Всенощное бдение'
-15,'Воскресенье','[b:Неделя 3-я Великого поста.][i:Глас 7-ый][br][b:Крестопоклонная.]','10:30[br]14:00','Литургия Василия Великого[br]Крещение'
-16,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза.]','10:00-15:00','Уборка'
-18,'Среда','[i:Храм Александра Невского открыт для молитвы.][br][b:Литургия Преждеосвященных Даров.]','11:00-15:00[br]18:30','Храм открыт[br]Литургия'
-20,'Пятница','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-21,'Суббота','Канун воскресного дня.','нет служб','нет служб'
-22,'Воскресенье','[b:Неделя 4-я Великого поста.Крестопоклонная. День памяти сорока севастийских мучеников. ][i:Глас 8-ый.]','10:30','Литургия В.Великого'
-23,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза.]','10:00-15:00','Уборка'
-25,'Среда','[i:Храм Александра Невского открыт для молитвы.][br][b:Литургия Преждеосвященных Даров.]','11:00-15:00[br]18:30','Храм открыт[br]Литургия'
-26,'Четверг','[b,red:Мариино Стояние. Утреня с чтением Канона Андрея Критского и жития Марии Египетской.]','18:30','Утреня'
-27,'Пятница','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-28,'Суббота','Канун воскресного дня.[i:Глас 8-ый.][b,blue:Акафиста. Похвала Пресвятой Богородицы.]','17:30','Всенощное бдение'
-29,'Воскресенье','[b:Неделя 5-я Великого поста. ][b,i:Прп. Марии Египетской.][i:Глас 1-ый]','10:30','Литургия Василия Великого'
-30,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником.(о.Анатолий)]','10:00-15:00','Уборка'
-## Month: Апрель-2026
-1,'Среда','[i:Храм Александра Невского открыт для молитвы.][br][b:Литургия Преждеосвященных Даров]','11:00-15:00[br]18:30','Храм открыт[br]Литургия'
-3,'Пятница','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-'[b,green:4]','[b,green:Суббота]','[b,green,i:Воскрешение Праведного Лазаря. Лазарева Суббота.]','[b,green:10:30]','[b,green:Литургия]'
-'[b,green:5]','[b,green:Воскресенье]','[b,green:Вход Господень в Иерусалим. Вербное воскресенье.]','[b,green:10:30]','[b,green:Литургия]'
-'[b,green:6]','[b,green:Великий Понедельник]','[b,green,i:Страстная седмица.][br][b,i,red:Генеральная пред-Пасхальная уборка в храме. ][br][b,green,i:Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о. Анатолий)]','[b,green:10:00-15:00]','[b,green:Уборка храма]'
-'[b,blue:7]','[b,blue:Великий Вторник]','[b,green,i:Страстная седмица.][br][b,blue:БЛАГОВЕЩЕНИЕ ПРЕСВЯТОЙ БОГОРОДИЦЫ].','[b,blue:10:30]','[b,blue:Литургия]'
-'[b,green:8]','[b,green:Великая ][br][b,green:Среда]','[b,green,i:Страстная седмица.][br][b,green,i:Храм Александра Невского открыт для молитвы.][br][b,green:Соборование.]','[b,green:11:00-15:00][br][b,green:18:30 ]','[b,green:Храм открыт][br][b,green:Соборование]'
-'[b,green:9]','[b,green:Великий Четверток]','[b,green,i:Страстная седмица.][br][b,green,i:Воспоминание Тайной Вечери.][br][b,green,i:Утреня с чтением 12-ти Евангелий.]','[b,green:9:30][br][b,green:18:30 ]','[b,green:Литургия][br][b,green:Утреня]'
-'[green:10]','[b,green:Великий Пяток]','[b,green,i:Страстная седмица.][br][b,green,i:Вечерня Великой Субботы с выносом Плащаницы ][br][b,green,i:и Утреня с чином Погребения.]','[green:15:30][br][green:18:30]','[green:Вечерня ][br][green:Утреня]'
-'[b,green:11]','[b,green:Великая Суббота]','[b,i:Литургия св. Василия Великого с чтением 15-ти паремий.][br][b:После Литургии приблизительно с 12:30 и до 15:00 – освящение яиц, куличей, пасх и мясных продуктов!]','[b,green:9:30][br][b:12:30-15:00]','[b,green:Литургия][br][b:Освящение куличей и снеди]'
-'','','[b,i,red:Вечером,11 апреля, храм откроется в 22.00 !!!]','',''
-'','','[b,red:Начало чтения книги Деяний святых апостолов]','[b,red:22:30]',''
-'','','[b,red:Полунощница]','[b,red:23:30]',''
-'','','[b,red:Крестный ход]','[b,red:23:45]',''
-'','','[b,red:Пасхальная утреня]','[b,red:00:00]',''
-'','','[b,red:Пасхальная Литургия]','[b,red:по окончании утрени]',''
-'[b,red:12]','[b,red:Воскресенье][br][b,red:Христово]','[b,i,red:Пасха Христова! ][br][b,i,red,x2:ХРИСТОС ВОСКРЕСЕ! ВОИСТИНУ ВОСКРЕСE ХРИСТОС!]','',''
-'','-:-','[b:Примерно в 01:30, после Пасхальной Литургии будет совершено освящение яиц, куличей, пасх и мясных продуктов. ][br][b:Утром, 12 апреля, в 12:00, 13:00, 14:00 и 15:00 будет совершено освящение яиц, куличей, пасх и мясных продуктов. В 16.00 храм закроется!]','','-:-'
-'[red:13]','[red:Понедельник ]','[b,i,red:Христос Воскресе!][br][i,red:Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о. Анатолий)]','[red:10:00-15:00]','[red:Уборка храма]'
-'[red:15]','[red:Среда]','[b,i,red:Христос Воскресе!][br][i,red:Храм Александра Невского открыт для молитвы.]','[red:11:00-15:00]','[red:Храм открыт]'
-'[b,red:17]','[b,red:Пятница ]','[b,i,red:Христос Воскресе!][br][b,i,red:Храм Александра Невского открыт для молитвы.]','[b,red:11:00-15:00]','[b,red:Храм открыт]'
-'[b,red:18]','[b,red:Суббота ]','[b,i,red:Христос Воскресе!][br][b,red:Канун воскресного дня.]','[b,red:17:30]','[b,red:Всенощное Бдение ]'
-'[b,red:19]','[b,red:Воскресенье ]','[b,red:Неделя 2-я по Пасхе. Апостола Фомы. Антипасха.][br][b,i,red:Детский Пасхальный праздник]','[b,red:10:30][br][b,red:12:30]','[b,red:Литургия][br][b,red:Детский Пасхальный праздник]'
-20,'Понедельник','[i:Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о. Анатолий)]','10:00-15:00',''
-'[b:21]','[b:Вторник]','[b:Радоница]','[b:14:00]','[b:Первая панихида после Пасхи Христовой]'
-22,'Среда','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-24,'Пятница','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-25,'Суббота','Канун воскресного дня.','17:30','Всенощное Бдение'
-26,'Воскресенье','3-я неделя по Пасхе. Глас 2-й.[br][b,i:Святых жен-мироносиц. Тамары, царицы Грузинской.][br][b:Приезд сестер Свято-Елисаветинского монастыря.]','10:30[br]12:30','Литургия[br]Выставка-ярмарка'
-27,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о. Анатолий)]','10:00-15:00','Уборка в храме'
-29,'Среда','[i:Храм Александра Невского открыт для молитвы.]','11:00-15:00','Храм открыт'
-## Month: Май-2026
-1,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-2,'Суббота','Канун воскресного дня.','17:30','Всенощное Бдение'
-3,'Воскресенье','[b,green:Неделя 4-я по Пасхе, о расслабленном.][b:Прав. Тавифы. ][i:Глас 3-ый]','10:30','Литургия'
-4,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза.]','10:00-15:00','[i:Уборка храма]'
-6,'Среда','Вмч. [b,green:Георгия Победоносца. Иверской иконы Божьей Матери.]Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-8,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-9,'Суббота','Канун воскресного дня.','нет служб','нет служб'
-10,'Воскресенье','[b:Неделя 5-я по Пасхе. О самаряныне. ][i:Глас 4-ий ]','10:30','Литургия'
-11,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником.(о.Анатолий). ]','10:00-15:00','[i:Уборка храма]'
-13,'Среда','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-15,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-16,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
-17,'Воскресенье','[b:Неделя 5-ая по Пасхе. О слепом. Мч. Пелагии, девы Тарсийской. ][i:Глас 5-ый.]','10:30','Литургия'
-18,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником .(о.Анатолий).]','10:00-15:00','[i:Уборка храма ]'
-20,'Среда','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-'[b,grey:21]','[b,red:Четверг]','[b,red:Вознесение Господне.][br][b:Апостола и евангелиста Иоанна Богослова, прп. Арсения Великого.]','[b,red:10:30]','[b,red:Литургия]'
-22,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-23,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
-24,'Воскресенье','[b:Равноапп. Кирилла и Мефодия, учителей Словенских. ][i:Глас 5-ый.]','10:30','Литургия'
-25,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о.Анатолий)]','10:30-15:00','[i:Уборка храма ]'
-27,'Среда','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-29,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-'[b,green:30]','[b,green:Суббота]','[b,green:Троицкая родительская суббота.][br][b,green:Канун воскресного дня. ]','[b,green:14:00][br][b,green:17:30]','[b,green:Панихида][br][b,green:Всенощное бдение]'
-'[b,green:31]','[b,green:Воскресенье]','[b,green:День Святой Троицы. Пятидесятница]','[b,green:10:30]','[b,green:Литургия]'
-## Month: Июнь-2026
-1,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о.Анатолий). ]','10:00-15:00','[i:Уборка храма]'
-3,'Среда','Храм открыт для молитвы.','11:00-15:00[br]14:00','Храм открыт[br]Молебен'
-5,'Пятница','Храм открыт для молитвы.','11:00-15:00[br]14:00','Храм открыт[br]Молебен'
-6,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
-7,'Воскресенье','[b,i:Неделя 1-я по Пятидесятнице, Всех святых. ][i:Глас 8-й.]','10:30','Литургия'
-8,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза.]','10:00-15:00','[i:Уборка храма]'
-10,'Среда','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-12,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-13,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
-14,'Воскресенье','Неделя 2-я по Пятидесятнице. Глас 1-й. Петров пост.[br][b,i,red:Всех святых в земле Русской просиявших.]','10:30','Литургия'
-15,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о.Анатолий)]','10:30-15:00[br]14:00','[i:Уборка храма][br]Панихида'
-17,'Среда','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-19,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-20,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
-21,'Воскресенье','Неделя 3-я по Пятидесятнице. Глас 2-й.','10:30','Литургия'
-22,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о.Анатолий)]','10:30-15:00[br]14:00','[i:Уборка храма][br]Панихида'
-24,'Среда','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-26,'Пятница','Храм открыт для молитвы.','11:00-15:00','Храм открыт'
-27,'Суббота','Канун воскресного дня.','17:30','Всенощное бдение'
-28,'Воскресенье','Неделя 4-я по Пятидесятнице. Глас 3-ый.','10:30','Литургия'
-29,'Понедельник','[i:Уборка в храме. Приходите все желающие. После уборки совместная трапеза и беседа со священником. (о.Анатолий)]','10:30-15:00','[i:Уборка храма]'
+## Month: September-2026
+1,'Monday','Cleaning day in the church. Everyone is welcome. Shared meal.Consultation with the priest (Fr. Anatoli).','10:00-15:00','Cleaning'
+1,'Wednesday','The church of Alexander Nevsky is open for prayer.','11:00-15:00','Church open'
+4,'Friday','The church of Alexander Nevsky is open for prayer.','11:00-15:00[br]15:00','Church open[br]Confession'
+5,'Saturday','Eve of Sunday.','17:30','No services'
+6,'Sunday','13th Sunday after Pentecost. Tone 4. Apostle Bartholomew, apostle Titus of the Seventy. All saints of Moscow.','9:50[br]10:30','Confession (until the Gospel reading)[br]Liturgy'
+7,'Monday','Cleaning day in the church. Everyone is welcome. Shared meal.','10:00-15:00','Cleaning'
+9,'Wednesday','The church of Alexander Nevsky is open for prayer.','11:00-15:00','Church open'
+11,'Friday','[b,red:Commemoration of the Beheading of John the Forerunner and Baptist of the Lord.][br]The church of Alexander Nevsky is open for prayer.','11:00-15:00[br]15:00','Church open[br]Confession'
+12,'Saturday','Eve of Sunday.[br][b,red:Commemoration of the translation of the relics of the Grand Prince Alexander Nevsky. Parish feast.]','10:30','Liturgy + parish feast'
+13,'Sunday','15th Sunday after Pentecost. Tone 6. Beginning of the church year (Indiction). All saints of Sarov, all saints of Nizhny Novgorod.','9:50[br]10:30','Confession (until the Gospel reading)[br]Liturgy'
+14,'Monday','Cleaning day in the church. Everyone is welcome. Shared meal. Consultation with the priest (Fr. Anatoli).','10:00-15:00','Cleaning'
+16,'Wednesday','The church of Alexander Nevsky is open for prayer.','11:00-15:00','Church open'
+20,'Friday','The church of Alexander Nevsky is open for prayer.','11:00-15:00[br]15:00','Church open[br]Confession'
+21,'Saturday','Eve of Sunday. ,[b,blue:forefeast of the Nativity of our Most Holy Lady Theotokos and Ever-Virgin Mary.]','10:30','Vigil'
+20,'Sunday','15th Sunday after Pentecost, Sunday before the Exaltation of the Cross. Tone 6.[br][b,blue:Nativity of our Most Holy Lady Theotokos and Ever-Virgin Mary.]','9:50[br]10:30','Confession (until the Gospel reading)[br]Liturgy'
+22,'Monday','Cleaning day in the church. Everyone is welcome. Shared meal. Consultation with the priest (Fr. Anatoli).','10:00-15:00','Cleaning'
+24,'Wednesday','The church of Alexander Nevsky is open for prayer.','11:00-15:00','Church open'
+26,'Friday','The church of Alexander Nevsky is open for prayer.[br]Vigil. Eve of the Exaltation of the Cross.','11:00-15:00[br]15:00','Church open[br]Confession'
+27,'Saturday','Eve of Sunday.','15:00[br]17:30','Confession[br]Vigil'
+28,'Sunday','17th Sunday after Pentecost[b,red:.][br][b,red:Universal Exaltation of the Precious and Life-giving Cross of the Lord.]Tone 7.','9:50[br]10:30','Confession (until the Gospel reading)[br]Liturgy'
+29,'Monday','Cleaning day in the church. Everyone is welcome. Shared meal.Consultation with the priest (Fr. Anatoli).','10:00-15:00','Cleaning'
+## Month: August-2026
+1,'Saturday','[b,i:Venerable father Seraphim of Sarov.]Eve of Sunday.','','No services'
+2,'Sunday','9th Sunday after Pentecost. Tone 8.','9:50[br]10:30[br]14:00','Confession (until the Gospel reading)[br]Liturgy[br]Baptism'
+3,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal.]','10:00-15:00','Cleaning'
+4,'Tuesday','The day of the Holy Myrrh-bearer Mary Magdalene.','','No services'
+5,'Wednesday','[i:The church is open for prayer.]','11:00-15:00','Church open'
+7,'Friday','[i:The church is open for prayer.]','11:00-15:00','Church open'
+8,'Saturday','Eve of Sunday. Name day of the Great Martyr and healer Saint Panteleimon.','','No services'
+9,'Sunday','10th Sunday after Pentecost. Tone 1.','9:50[br]10:30[br]14:00','Confession (until the Gospel reading)[br]Liturgy[br]Baptism'
+10,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal. Consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+12,'Wednesday','[i:The church is open for prayer.]','11:00-15:00','Church open'
+14,'Friday','The beginning of the «Dormition Fast».[br][i:The church is open for prayer.]','11:00-15:00[br]15:00','Church open[br]Confession'
+15,'Saturday','Eve of Sunday.','15:00[br]16:30','Confession[br]Moleben'
+16,'Sunday','11th Sunday after Pentecost. Tone 2. Dormition Fast.[br]Forefeast of the Transfiguration on Mount Tabor.','9:50[br]10:30[br]14:00','Confession (until the Gospel reading)[br]Liturgy[br]Baptism'
+17,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal. Consultation with the priest (Fr. Anatoli).]','10:00-15:00','Church open'
+'[b,red:19]','[b,red:Wednesday]','[b,red:Transfiguration of our Lord God and Saviour Jesus Christ.]','[b,red:10:30]','[b,red:Liturgy]'
+21,'Friday','[i:The church is open for prayer.]','11:00-15:00','Church open'
+22,'Saturday','Eve of Sunday.','15:00[br]17:30','Confession[br]Vigil'
+23,'Sunday','12th Sunday after Pentecost. Tone 3. Dormition Fast.[br][i:Afterfeast of the Transfiguration of our Lord God on Mount Tabor. All saints of Valaam and Kemerovo.]','9:50[br]10:30','Confession (until the Gospel reading)[br]Liturgy'
+24,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal. Consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+26,'Wednesday','[i:The church is open for prayer.]','11:00-15:00','Church open'
+'[b,blue:28]','[b,blue:Friday]','[b,blue:Dormition of our Most Holy Lady Theotokos and Ever-Virgin Mary.]','[b,blue:10:30]','[b,blue:Liturgy]'
+29,'Saturday','Eve of Sunday.','','No services'
+30,'Sunday','13th Sunday after Pentecost. Tone 4.','9:50[br]10:30','Confession (until the Gospel reading)[br]Liturgy'
+31,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal. Consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+## Month: May-2026
+1,'Friday','The church is open for prayer.','11:00-15:00','Open'
+2,'Saturday','Eve of Sunday.','17.30','Vigil'
+3,'Sunday','[b:4th Sunday after Pascha. The healing of the paralytic.][i:Tone 3.]','10:30[br]13:00[br]Baptism','Liturgy[br]Panikhida[br]Baptism'
+4,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal.]','10:00-15:00','Cleaning'
+6,'Wednesday','The church is open for prayer.','11:00-15:00','Open'
+8,'Friday','The church is open for prayer.','11:00-15:00','Open'
+9,'Saturday','Eve of Sunday.','17.30','Vigil'
+10,'Sunday','The 5th Sunday after Pascha. The martyr Photini (Svetlana) the Samaritan Woman. Tone 4.','10:30[br]14:00','Liturgy[br]Baptism'
+11,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal and consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+13,'Wednesday','The church is open for prayer.','11:00-15:00','Open'
+15,'Friday','The church is open for prayer.','11:00-15:00','Open'
+16,'Saturday','Eve of Sunday.','17:30','Vigil'
+17,'Sunday','The 6th Sunday after Pascha. The healing of the blind man. Tone 5.','10:30','Liturgy'
+18,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal and consultation with the priest (Fr. Anatoli).]','10:30-15:00','Cleaning'
+20,'Wednesday','The church is open for prayer.','11:00-15:00','Open'
+'[b,red:21]','[b,red:Thursday]','[b,red:Ascension of the Lord.]','[b,red:10:30]','[b,red:Liturgy]'
+22,'Friday','The church is open for prayer.','11:00-15:00','Open'
+23,'Saturday','Eve of Sunday.','17:30','Vigil'
+24,'Sunday','The 7th Sunday after Pascha.','10:30','Liturgy'
+25,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared meal and consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+27,'Wednesday','The church is open for prayer.','11:00-15:00','Open'
+29,'Friday','The church is open for prayer.','11:00-15:00','Open'
+'[b,green:30]','[b,green:Saturday]','[b,green:Pentecost memorial of the departed.][br][b,green:Eve of Sunday.]','[b,green:14:00][br][b,green:17:30]','[b,green:Panikhida][br][b,green:Vigil]'
+'[b,green:31]','[b,green:Sunday]','[b,green:Pentecost.]','[b,green:10:30]','[b,green:Liturgy]'
+## Month: April-2026
+1,'Wednesday','[i:The church of Alexander Nevsky is open for prayer.][br][b:Liturgy of the Presanctified Gifts.]','11:00-15:00[br]18:30','Open[br]Liturgy'
+3,'Friday','[i:The church of Alexander Nevsky is open for prayer.]','11:00-15:00','Open'
+'[b,green:4]','[b,green:Saturday]','[b,green:Eve of Sunday.][br][b,green:Lazarus Saturday, (][b,green,i:commemoration of the raising of the Righteous Lazarus by Jesus Christ][b,green:)]','[b,green:10:30]','[b,green:Liturgy]'
+'[b,green:5]','[b,green:Sunday]','[b,green:Palm Sunday. The sixth Sunday of Great Lent, the Entry of the Lord into Jerusalem.][b,i,green:Tone 1.]','[b,green:10:30]','[b,green:Liturgy]'
+'[b,green:6]','[b,green:Great Monday]','[b,i,red:The GREAT cleaning of the church before Pascha.][br][i:Everyone is welcome to help. Shared lunch and consultation with the priest (Fr. Anatoli).]','10:00-15:00','[b,red:Great cleaning]'
+'[b,green:7]','[b,green:Great Tuesday]','[b,blue:ANNUNCIATION OF THE MOST HOLY THEOTOKOS.]','10:30','[b:Liturgy]'
+'[b,green:8]','[b,green:Great Wednesday]','[i:The church of Alexander Nevsky is open for prayer.][br][b:Liturgy of the Presanctified Gifts.]','11:00-15:00[br]18:30','Open[br]Liturgy'
+'[b,green:10]','[b,green:Great Friday]','[i,green:Vespers with the carrying out of the Shroud and Matins with the Lamentations.]','15:30[br]18:30','Vespers[br]Matins'
+'[b,red:11]','[b,red:Great Saturday]','[b,red:Liturgy of St Basil the Great with the reading of the 15 parables.][br][i:After the Liturgy, from around 12.30 until 15.00, all food brought along (eggs, Easter breads, meats) is blessed!]','[red:9:30][br][red:12:30-15:00]','[red:Liturgy][br][red:Blessing of eggs]'
+'','','[b,red:On the evening of 11 April, THE CHURCH OPENS AT 22.00!!!]','[b,red:22:00]','[b,red:The church opens]'
+'','','[b,red:Reading of the Acts of the Holy Apostles]','[b,red:22:30]','[b,red:Paschal celebration]'
+'','','[b,red:Midnight Office]','[b,red:23:30]','[b,red:Paschal celebration]'
+'','','[b,red:Cross procession]','[b,red:23:45]','[b,red:Paschal celebration]'
+'','','[b,red:Paschal Matins]','[b,red:00:00]','[b,red:Paschal celebration]'
+'','','[b,red:Paschal Liturgy]','[b,red:Immediately after]','[b,red:Paschal celebration]'
+'[b,red:12]','[b,red:Sunday]','[b,red:CHRIST IS RISEN! HE IS RISEN INDEED!][br][i:On the morning of 20 April, at][br][i:12.00, 13.00, 14.00 and 15.00 the blessing takes place][br][i:of eggs, Easter cakes, “Pascha” (kulich) and meat products.][br][i:The church closes at 16.00!]','[i:12.00][br][i:13.00][br][i:14.00][br][i:15.00]','[i:Blessing of the Paschal eggs, meats and “Pascha” (kulich)]'
+'','','[b,red:Bright Week (no fasting) Christ is risen!]','',''
+'[b,red:13]','[b,red:Monday]','[b,red:CHRIST IS RISEN!][br][i:Everyone is welcome to help. Shared lunch and consultation with the priest (Fr. Anatoli).]','10:00-15:00','[b,red:Great cleaning]'
+'[b,red:16]','[b,red:Wednesday]','[b,red:CHRIST IS RISEN!][br][i:The church of Alexander Nevsky is open for prayer.]','10:00-15:00','Open'
+'[b,red:18]','[b,red:Friday]','[b,red:CHRIST IS RISEN!][br][i:The church of Alexander Nevsky is open for prayer.]','10:00-15:00','Open'
+'[b,red:19]','[b,red:Saturday]','[b,red:Eve of Sunday.]','17:30','Vigil'
+'[b,red:19]','[b,red:Sunday]','[b,red:2nd Sunday after Pascha. Apostle Thomas. Antipascha][br][b,i,red:Paschal children’s celebration!]','[b,red:10:30][br][b,red:12:30]','[b,red:Liturgy][br][b,red:Children’s celebration]'
+20,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared lunch and consultation with the priest (Fr. Anatoli).]','10:00-15:00',''
+21,'Tuesday','[b:2nd Tuesday after Pascha. Radonitsa.]Paschal commemoration of all departed fathers, brothers and sisters.','14:00','Panikhida'
+22,'Wednesday','[i:The church of Alexander Nevsky is open for prayer.]','11:00-15:00','Open'
+24,'Friday','[i:The church of Alexander Nevsky is open for prayer.]','11:00-15:00','Open'
+25,'Saturday','Eve of Sunday.','17:30','Vigil'
+26,'Sunday','[b:3rd Sunday after Pascha.][br][b:Visit of the sisters of the St Elisabeth Convent]','10:30[br]12:30','Liturgy[br]Fair'
+27,'Monday','[i:Cleaning of the church. Everyone is welcome. Shared lunch and consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+29,'Wednesday','[i:The church of Alexander Nevsky is open for prayer.]','11:00-15:00','Open'
+## Month: March-2026
+1,'Sunday','[b:The first Sunday of Great Lent.][b,i:Sunday of the Triumph of Orthodoxy.][br][i:Tone 5.]','10:30','Liturgy'
+2,'Monday','[i:Cleaning of the church. Everyone is welcome. A shared meal and a consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+4,'Wednesday','[i:The church of Alexander Nevsky is open.]','11:00-15:00','Open'
+6,'Friday','[i:The church of Alexander Nevsky is open.]','11:00-15:00','Open'
+7,'Saturday','[b:Memorial of the departed.][br]Eve of Sunday.','14:00[br]17:30','Panikhida[br]Vigil'
+8,'Sunday','[b:The second Sunday of Great Lent. Commemoration of St Gregory Palamas.][i:Tone 6.]','10:30','Liturgy'
+9,'Monday','[i:Cleaning of the church. Everyone is welcome. A shared meal and a consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+11,'Wednesday','[i:The church of Alexander Nevsky is open.][br][b:Liturgy of the Presanctified Gifts.]','11:00-15:00[br]18:30','Open[br]Liturgy'
+13,'Friday','[i:The church of Alexander Nevsky is open.]','11:00-15:00','Open'
+14,'Saturday','Eve of Sunday.','17:30','Vigil'
+15,'Sunday','[b:The third Sunday of Great Lent.][i:Tone 7.]','10:30','Liturgy'
+16,'Monday','[i:Cleaning of the church. Everyone is welcome. A shared meal.]','10:00-15:00','Cleaning'
+18,'Wednesday','[i:The church of Alexander Nevsky is open.][br][b:Liturgy of the Presanctified Gifts.]','11:00-15:00[br]18:30','Open[br]Liturgy'
+20,'Friday','[i:The church of Alexander Nevsky is open.]','11:00-15:00','Open'
+21,'Saturday','Eve of Sunday.','no services','no services'
+22,'Sunday','[b:The fourth Sunday of Great Lent.][i:Tone 8.][br][b:The week of the Veneration of the Cross.][br][b:Commemoration of the 40 martyrs of Sebaste.]','10:30','Liturgy'
+23,'Monday','[i:Cleaning of the church. Everyone is welcome. A shared meal and a consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
+25,'Wednesday','[i:The church of Alexander Nevsky is open.][br][b:Liturgy of the Presanctified Gifts.]','11:00-15:00[br]18:30','Open[br]Liturgy'
+26,'Thursday','[b:Matins with the Canon of St Andrew of Crete with the reading of the Life of Mary of Egypt.]','18:30','Matins'
+27,'Friday','[i:The church of Alexander Nevsky is open]','11:00-15:00','Open'
+28,'Saturday','Eve of Sunday.','17:30','Vigil'
+29,'Sunday','[b:The fifth Sunday of Great Lent.][i:Tone 1.][i,b:Mary of Egypt.]','10:30','Liturgy'
+30,'Monday','[i:Cleaning of the church. Everyone is welcome. A shared meal and a consultation with the priest (Fr. Anatoli).]','10:00-15:00','Cleaning'
 </script>
 <script>
+const ENGLISH_MONTHS = ['january','february','march','april','may','june',
+                        'july','august','september','october','november','december'];
+
+function isCurrentMonth(label) {
+  const now = new Date();
+  return label.toLowerCase().replace(/\s+/g, '')
+    === ENGLISH_MONTHS[now.getMonth()] + '-' + now.getFullYear();
+}
+
 function renderSchedule(csv) {
   const container = document.getElementById('schedule-container');
   let html = '';
   let tableOpen = false;
-  const TH = '<thead><tr><th>Day</th><th>Day of week</th><th>Description</th><th>Time</th><th>Category</th></tr></thead><tbody>';
+  const TH = '<thead><tr><th>Day</th><th>Weekday</th><th>Description</th><th>Time</th><th>Category</th></tr></thead><tbody>';
 
   csv.split('\n').forEach(line => {
     line = line.trim();
     if (!line) return;
 
     if (line.startsWith('## Month:')) {
-      if (tableOpen) html += '</tbody></table>';
+      if (tableOpen) html += '</tbody></table></details>';
       const month = line.substring(9).trim();
-      html += '<h2 class="schedule-month">' + month + '</h2>';
+      html += '<details class="schedule-month-block"' + (isCurrentMonth(month) ? ' open' : '') + '>';
+      const dash = month.indexOf('-');
+      html += '<summary><h3 class="schedule-month">'
+            + (dash > -1 ? month.slice(0, dash) : month)
+            + (dash > -1 ? '<span class="schedule-month__year">' + month.slice(dash) + '</span>' : '')
+            + '</h3></summary>';
       html += '<table class="schedule-table">' + TH;
       tableOpen = true;
       return;
@@ -202,21 +248,26 @@ function renderSchedule(csv) {
     }
   });
 
-  if (tableOpen) html += '</tbody></table>';
+  if (tableOpen) html += '</tbody></table></details>';
   container.innerHTML = html;
+
+  if (!container.querySelector('details[open]')) {
+    const first = container.querySelector('details');
+    if (first) first.open = true;
+  }
 }
 
 renderSchedule(document.getElementById('schedule-data').textContent);
 </script>
   </main>
   <footer class="site-footer">
-    <p>Church of the Holy Prince Alexander Nevsky</p>
+    <p>Church of the Holy Grand Prince Alexander Nevsky</p>
     <p><br></p>
     <p><a href="mailto:ruskerk.rdam@gmail.com">ruskerk.rdam@gmail.com</a></p>
     <div class="footer-links">
-      <a href="../../impressum/index.html">Impressum</a>
-      <a href="../../privacyverklaring/index.html">Privacyverklaring</a>
-      <a href="../../cookie-instellingen/index.html">Cookie-instellingen</a>
+      <a href="../../impressum/index.html">Imprint</a>
+      <a href="../../privacyverklaring/index.html">Privacy statement</a>
+      <a href="../../cookie-instellingen/index.html">Cookie settings</a>
     </div>
   </footer>
 </body>
