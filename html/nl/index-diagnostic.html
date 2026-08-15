@@ -6,21 +6,24 @@
 <title>Hero diagnostic — orthodoxkerk</title>
 
 <!--
-  Stylesheets are loaded in the same order as the live site.
-  Override any of them with query parameters, e.g.
-    ?custom=/css/custom.css&hotfix=/css/custom-hotfix.css&hotfixOn=1
-  Defaults assume this file sits next to the live page's CSS folder.
+  Stylesheets load in the same order as the live site.
+
+  The hotfix link is NOT disabled: a disabled <link> is not fetched until it
+  is enabled, which races the first measurement. It is controlled by the
+  ?hotfix= parameter below instead, and the panel verifies which file is
+  actually live by reading the --hf-version custom property the CSS declares.
+
+  Bump ?v= on every edit of the CSS — raw.githack caches aggressively.
 -->
 <link id="dx-pico"   rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-<link id="dx-custom" rel="stylesheet" href="../css/custom.css">
-<link id="dx-hotfix" rel="stylesheet" href="../css/custom-hotfix.css">
+<link id="dx-custom" rel="stylesheet" href="../css/custom.css?v=1">
+<link id="dx-hotfix" rel="stylesheet" href="../css/custom-hotfix.css?v=4">
 </head>
 <body>
 
 <!-- ====================================================================
-     Markup below mirrors the live page structure exactly. Nothing here
-     is styled by this file — all appearance comes from the linked CSS,
-     which is the point: the harness must not mask or invent behaviour.
+     Mirrors the live page structure. Nothing in this file styles it —
+     all appearance comes from the linked stylesheets, which is the point.
      ==================================================================== -->
 
 <header class="site-header">
@@ -70,9 +73,11 @@
   <section class="section-white">
     <div class="content-narrow">
       <h2>Welkom bij ons</h2>
-      <p>Welkom op de website van onze kerk. Deze pagina bestaat uitsluitend om de
-         koptekst en het menu op te meten; de inhoud hieronder dient alleen om de
-         pagina scrollbaar te maken.</p>
+      <p>Deze pagina bestaat uitsluitend om de koptekst op te meten. De tekst
+         hieronder dient alleen om de pagina scrollbaar te maken, zodat het
+         inklappen van de adresbalk kan worden getest.</p>
+      <p>Welkom op de website van onze kerk. We zijn blij u te begroeten en
+         nodigen u uit om deel uit te maken van onze gemeenschap.</p>
     </div>
   </section>
 </main>
@@ -86,9 +91,9 @@
   "use strict";
 
   /* ----------------------------------------------------------------------
-     The panel lives in a shadow root. Nothing in custom.css, PicoCSS or the
-     hotfix can reach into it, and nothing in it can leak out — so the
-     measurements describe the page, not the measuring apparatus.
+     The panel lives in a shadow root: nothing in PicoCSS, custom.css or the
+     hotfix can reach into it, and nothing in it can leak out. The panel must
+     never be able to influence what it is measuring.
      ---------------------------------------------------------------------- */
 
   var host = document.createElement("div");
@@ -104,10 +109,12 @@
     '.wrap { font: 400 12px/1.45 ui-monospace,"Roboto Mono",Menlo,monospace;',
     '        background:#0d1117; color:#e6edf3; border-top:2px solid #58a6ff;',
     '        max-height:56vh; max-height:56svh; overflow-y:auto;',
+    '        overscroll-behavior:contain;',
     '        padding-bottom:env(safe-area-inset-bottom); }',
+    '.wrap[data-collapsed="true"] { max-height:52px; }',
     '.bar { display:flex; gap:6px; padding:8px; flex-wrap:wrap;',
     '       position:sticky; top:0; background:#0d1117; border-bottom:1px solid #30363d; }',
-    'button { flex:1 1 auto; min-height:40px; padding:0 10px; font:inherit;',
+    'button { flex:1 1 auto; min-height:36px; padding:0 10px; font:inherit;',
     '         background:#21262d; color:#e6edf3; border:1px solid #30363d;',
     '         border-radius:5px; }',
     'button[data-on="true"] { background:#1f6feb; border-color:#1f6feb; color:#fff; }',
@@ -121,15 +128,16 @@
     '.note { padding:8px 10px; color:#c9d1d9; border-top:1px solid #30363d; }',
     '.note b { color:#58a6ff; }',
     'textarea { width:100%; height:150px; background:#010409; color:#8b949e;',
-    '           border:0; border-top:1px solid #30363d; font:11px/1.4 ui-monospace,monospace;',
-    '           padding:8px; white-space:pre; }',
+    '           border:0; border-top:1px solid #30363d;',
+    '           font:11px/1.4 ui-monospace,monospace; padding:8px; white-space:pre; }',
     '.probe { position:absolute; left:-9999px; width:1px; }',
     '</style>',
-    '<div class="wrap">',
+    '<div class="wrap" id="wrap">',
     '  <div class="bar">',
-    '    <button id="b-hotfix" data-on="false">Hotfix off</button>',
-    '    <button id="b-menu" data-on="false">Menu closed</button>',
     '    <button id="b-scan">Re-measure</button>',
+    '    <button id="b-menu" data-on="false">Menu closed</button>',
+    '    <button id="b-top">Scroll to top</button>',
+    '    <button id="b-fold">Hide</button>',
     '    <button id="b-copy">Copy report</button>',
     '    <button id="b-probe">Copy live probe</button>',
     '  </div>',
@@ -148,15 +156,18 @@
   var $ = function (id) { return root.getElementById(id); };
   var state = {};
 
-  /* ---------- query-string configuration ---------- */
+  /* ---------- optional query-string overrides ----------
+     Not required. Defaults point at ../css/. If the host strips query
+     strings, edit the <link> hrefs directly instead.                    */
 
   var qs = new URLSearchParams(location.search);
   ["pico", "custom", "hotfix"].forEach(function (k) {
     var href = qs.get(k);
     if (href) document.getElementById("dx-" + k).href = href;
   });
-  var hotfixOn = qs.get("hotfixOn") === "1";
-  document.getElementById("dx-hotfix").disabled = !hotfixOn;
+  if (qs.get("hotfixOff") === "1") {
+    document.getElementById("dx-hotfix").disabled = true;
+  }
 
   /* ---------- helpers ---------- */
 
@@ -181,7 +192,16 @@
 
   function unit(id) {
     var el = $(id);
-    return el && el.offsetHeight ? el.offsetHeight : null;
+    return (el && el.offsetHeight) ? el.offsetHeight : null;
+  }
+
+  /* Reads the marker the hotfix declares, so the panel reports which
+     stylesheet is genuinely live rather than trusting link.disabled or
+     the HTTP cache. custom-hotfix.css v4 sets :root { --hf-version: "v4" } */
+  function hotfixVersion() {
+    var v = getComputedStyle(document.documentElement)
+              .getPropertyValue("--hf-version").trim();
+    return v ? v.replace(/^["']|["']$/g, "") : "none";
   }
 
   /* ---------- measurement ---------- */
@@ -189,10 +209,11 @@
   function measure() {
     var atTop = window.scrollY <= 2;
 
-    var hdr  = rect(".site-header");
-    var hero = rect(".hero-cover");
-    var h1   = rect(".hero-cover h1");
-    var nav  = rect(".site-nav");
+    var hdr   = rect(".site-header");
+    var mainR = rect("main");
+    var hero  = rect(".hero-cover");
+    var h1    = rect(".hero-cover h1");
+    var nav   = rect(".site-nav");
     var navEl = document.querySelector(".site-nav");
     var navOpen = navEl && navEl.classList.contains("open");
     var navVisible = navEl && getComputedStyle(navEl).display !== "none";
@@ -200,44 +221,65 @@
     var lh = h1 ? parseFloat(cs(".hero-cover h1", "lineHeight")) : 0;
     var lines = (h1 && lh) ? Math.round(h1.height / lh) : null;
 
-    var clearance = (hdr && h1) ? Math.round(h1.top - hdr.bottom) : null;
+    /* Rect-derived values are relative to the current scroll position.
+       Normalise them to document coordinates so a stray 39px of scroll
+       does not silently invalidate the reading. */
+    var sy = window.scrollY;
+    var docTop = function (r) { return r ? Math.round(r.top + sy) : null; };
+
+    var clearance   = (hdr && h1) ? Math.round(h1.top - hdr.bottom) : null;
     var hiddenAbove = h1 ? Math.max(0, Math.round(-h1.top)) : 0;
 
-    var u = { vh: unit("p-vh"), svh: unit("p-svh"), lvh: unit("p-lvh"), dvh: unit("p-dvh") };
+    var mainPad = cs("main", "paddingTop");
 
     state = {
+      hotfixVersion: hotfixVersion(),
+      hotfixLinkEnabled: !document.getElementById("dx-hotfix").disabled,
       atTop: atTop,
-      scrollY: Math.round(window.scrollY),
-      hotfix: !document.getElementById("dx-hotfix").disabled,
-      innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight,
-      clientHeight: document.documentElement.clientHeight,
-      dpr: window.devicePixelRatio,
-      units: u,
+      scrollY: Math.round(sy),
+
+      mainPaddingTop: mainPad,
+      mainTop_doc: docTop(mainR),
+
       headerHeight: hdr ? Math.round(hdr.height) : null,
       headerBottom: hdr ? Math.round(hdr.bottom) : null,
       headerPosition: cs(".site-header", "position"),
-      heroTop: hero ? Math.round(hero.top) : null,
+
+      heroTop_doc: docTop(hero),
+      heroTop_viewport: hero ? Math.round(hero.top) : null,
       heroHeight: hero ? Math.round(hero.height) : null,
       heroMinHeight: cs(".hero-cover", "minHeight"),
       heroPaddingTop: cs(".hero-cover", "paddingTop"),
       heroMarginTop: cs(".hero-cover", "marginTop"),
-      heroOverflow: cs(".hero-cover", "overflow"),
       heroAlign: cs(".hero-cover", "alignItems"),
-      h1Top: h1 ? Math.round(h1.top) : null,
+      heroOverflow: cs(".hero-cover", "overflow"),
+
+      h1Top_doc: docTop(h1),
+      h1Top_viewport: h1 ? Math.round(h1.top) : null,
       h1Height: h1 ? Math.round(h1.height) : null,
       h1FontSize: cs(".hero-cover h1", "fontSize"),
       h1LineHeight: cs(".hero-cover h1", "lineHeight"),
       h1Lines: lines,
+
       clearance: clearance,
       hiddenAbove: hiddenAbove,
+
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      clientHeight: document.documentElement.clientHeight,
+      dpr: window.devicePixelRatio,
+      orientation: (screen.orientation && screen.orientation.type) || "—",
+      units: { vh: unit("p-vh"), svh: unit("p-svh"),
+               lvh: unit("p-lvh"), dvh: unit("p-dvh") },
+
+      navToggleDisplay: cs(".nav-toggle", "display"),
       navDisplay: navVisible ? "visible" : "none",
       navOpen: !!navOpen,
       navHeight: (nav && navVisible) ? Math.round(nav.height) : null,
       navBottom: (nav && navVisible) ? Math.round(nav.bottom) : null,
       navOverflowsViewport: (nav && navVisible)
         ? nav.bottom > document.documentElement.clientHeight : false,
-      navToggleDisplay: cs(".nav-toggle", "display"),
+
       docScrollWidth: document.documentElement.scrollWidth,
       horizontalOverflow: document.documentElement.scrollWidth >
                           document.documentElement.clientWidth
@@ -249,17 +291,29 @@
 
   function paint() {
     var s = state;
+    var padOK = parseFloat(s.mainPaddingTop) >= 100;
     var html = "";
 
+    /* The two rows that decide whether the run is even valid come first. */
+    html += sect("Which CSS is live", [
+      ["hotfix marker", s.hotfixVersion,
+        s.hotfixVersion === "none" ? "bad" : "ok"],
+      ["<link> enabled", s.hotfixLinkEnabled ? "yes" : "no"],
+      ["main padding-top", s.mainPaddingTop, padOK ? "ok" : "bad"],
+      ["measured at scroll top", s.atTop ? "yes" : "NO (values normalised)",
+        s.atTop ? "ok" : "warn"]
+    ]);
+
     html += sect("Verdict", [
-      ["hotfix", s.hotfix ? "ON" : "off", s.hotfix ? "ok" : ""],
-      ["measured at scroll top", s.atTop ? "yes" : "NO — scroll up",
-        s.atTop ? "ok" : "bad"],
+      ["hero top (document)", s.heroTop_doc + "px",
+        s.heroTop_doc === 0 ? "ok" : "bad"],
       ["H1 clear of header by", s.clearance === null ? "—" : s.clearance + "px",
-        s.clearance === null ? "" : (s.clearance < 0 ? "bad" : (s.clearance < 8 ? "warn" : "ok"))],
-      ["H1 hidden above viewport", s.hiddenAbove + "px", s.hiddenAbove > 0 ? "bad" : "ok"],
-      ["horizontal overflow", s.horizontalOverflow ?
-        (s.docScrollWidth - document.documentElement.clientWidth) + "px" : "none",
+        s.clearance === null ? ""
+          : (s.clearance < 0 ? "bad" : (s.clearance < 8 ? "warn" : "ok"))],
+      ["H1 hidden above viewport", s.hiddenAbove + "px",
+        s.hiddenAbove > 0 ? "bad" : "ok"],
+      ["horizontal overflow", s.horizontalOverflow
+        ? (s.docScrollWidth - document.documentElement.clientWidth) + "px" : "none",
         s.horizontalOverflow ? "warn" : "ok"]
     ]);
 
@@ -270,9 +324,10 @@
     ]);
 
     html += sect("Hero", [
-      ["rect.top", s.heroTop + "px"],
+      ["top (document)", s.heroTop_doc + "px", s.heroTop_doc === 0 ? "ok" : "bad"],
+      ["top (viewport)", s.heroTop_viewport + "px"],
       ["height", s.heroHeight + "px"],
-      ["min-height (computed)", s.heroMinHeight],
+      ["min-height", s.heroMinHeight],
       ["padding-top", s.heroPaddingTop],
       ["margin-top", s.heroMarginTop],
       ["align-items", s.heroAlign],
@@ -280,12 +335,13 @@
     ]);
 
     html += sect("H1", [
-      ["rect.top", s.h1Top + "px", s.h1Top < 0 ? "bad" : ""],
+      ["top (document)", s.h1Top_doc + "px"],
+      ["top (viewport)", s.h1Top_viewport + "px",
+        s.h1Top_viewport < 0 ? "bad" : ""],
       ["height", s.h1Height + "px"],
       ["font-size", s.h1FontSize],
       ["line-height", s.h1LineHeight],
-      ["wrapped lines", s.h1Lines === null ? "—" : s.h1Lines,
-        s.h1Lines >= 4 ? "warn" : ""]
+      ["wrapped lines", s.h1Lines === null ? "—" : s.h1Lines]
     ]);
 
     html += sect("Menu", [
@@ -298,6 +354,7 @@
     ]);
 
     html += sect("Viewport", [
+      ["orientation", s.orientation],
       ["innerWidth", s.innerWidth + "px"],
       ["innerHeight", s.innerHeight + "px"],
       ["clientHeight", s.clientHeight + "px"],
@@ -313,68 +370,105 @@
 
     $("out").innerHTML = html;
 
-    var notes = [];
-    if (!state.atTop) notes.push("Scroll to the very top — every rect is relative to the current scroll position.");
-    if (state.clearance !== null && state.clearance < 0)
-      notes.push("<b>Reproduced:</b> the H1 starts " + (-state.clearance) +
-                 "px above the header's bottom edge, so that much is behind the bar.");
-    if (state.hiddenAbove > 0)
-      notes.push("<b>Reproduced:</b> " + state.hiddenAbove +
-                 "px of the H1 is above the viewport entirely.");
-    if (state.units.lvh && state.units.svh && state.units.lvh > state.units.svh &&
-        /vh/.test(state.heroMinHeight) === false)
-      notes.push("Toolbar delta is " + (state.units.lvh - state.units.svh) +
-                 "px — relevant to any vh-based sizing on this page.");
-    if (state.navOverflowsViewport)
-      notes.push("<b>Menu overflows:</b> its bottom edge is at " + state.navBottom +
-                 "px against a " + state.clientHeight + "px viewport.");
-    if (!notes.length)
-      notes.push("No clipping detected in this configuration. Toggle the hotfix and rotate before concluding.");
+    /* ---- notes ---- */
+    var n = [];
 
-    $("note").innerHTML = notes.join("<br><br>");
+    if (s.hotfixVersion === "none") {
+      n.push("<b>The hotfix is not loaded.</b> Either the &lt;link&gt; is " +
+             "missing/disabled, the path is wrong, or a cached copy without " +
+             "the version marker is being served. Bump the ?v= number on the " +
+             "href and reload.");
+    } else if (!padOK) {
+      n.push("<b>Hotfix " + s.hotfixVersion + " is loaded but main still has " +
+             s.mainPaddingTop + ".</b> PicoCSS's <code>body &gt; main</code> is " +
+             "still winning — check the load order of the stylesheets.");
+    }
+
+    if (padOK && s.heroTop_doc === 0) {
+      n.push("<b>Header offset restored.</b> The hero's border box is at y=0, " +
+             "so the content box starts at its own padding-top (" +
+             s.heroPaddingTop + ") and centring cannot lift content above it.");
+    }
+    if (s.heroTop_doc !== null && s.heroTop_doc < 0) {
+      n.push("<b>Hero is " + (-s.heroTop_doc) + "px too high.</b> Expected 0. " +
+             "This is the margin-top:-112px pull exceeding main's actual " +
+             s.mainPaddingTop + " of padding.");
+    }
+    if (s.clearance !== null && s.clearance < 0) {
+      n.push("<b>Reproduced:</b> the top " + (-s.clearance) +
+             "px of the H1 is behind the fixed header.");
+    }
+    if (s.navOverflowsViewport) {
+      n.push("<b>Menu overflows:</b> bottom edge at " + s.navBottom +
+             "px against a " + s.clientHeight + "px viewport.");
+    }
+    if (!n.length) {
+      n.push("No clipping detected. Rotate to landscape and re-measure — " +
+             "that is the test that distinguishes a fix from a coincidence.");
+    }
+
+    $("note").innerHTML = n.join("<br><br>");
   }
 
   function writeReport() {
-    var lines = ["=== hero diagnostic " + new Date().toISOString() + " ==="];
-    lines.push("url: " + location.href);
-    lines.push("ua: " + navigator.userAgent);
-    lines.push("hotfix: " + (state.hotfix ? "ON" : "off"));
-    lines.push("scrollY: " + state.scrollY + (state.atTop ? "" : "   <-- INVALID, scroll to top"));
-    lines.push("");
+    var out = ["=== hero diagnostic " + new Date().toISOString() + " ==="];
+    out.push("url: " + location.href);
+    out.push("ua: " + navigator.userAgent);
+    out.push("");
+    out.push("hotfix marker: " + state.hotfixVersion);
+    out.push("main padding-top: " + state.mainPaddingTop +
+             (parseFloat(state.mainPaddingTop) >= 100 ? "   (fix applied)"
+                                                      : "   (fix NOT applied)"));
+    out.push("scrollY: " + state.scrollY +
+             (state.atTop ? "" : "   (rects normalised to document coords)"));
+    out.push("");
     Object.keys(state).forEach(function (k) {
       if (k === "units") {
-        lines.push("units: vh=" + state.units.vh + " svh=" + state.units.svh +
-                   " lvh=" + state.units.lvh + " dvh=" + state.units.dvh);
+        out.push("units: vh=" + state.units.vh + " svh=" + state.units.svh +
+                 " lvh=" + state.units.lvh + " dvh=" + state.units.dvh);
       } else {
-        lines.push(k + ": " + state[k]);
+        out.push(k + ": " + state[k]);
       }
     });
-    $("rep").value = lines.join("\n");
+    $("rep").value = out.join("\n");
   }
 
-  /* ---------- live-page probe (copied to clipboard) ---------- */
+  /* ---------- console probe for the live site ---------- */
 
   var LIVE_PROBE = [
     "(() => {",
     "  const q = s => document.querySelector(s);",
-    "  const hd = q('.site-header'), h = q('.hero-cover'), t = q('.hero-cover h1');",
-    "  if (!hd || !h || !t) return console.warn('selectors not found on this page');",
-    "  const hdr = hd.getBoundingClientRect(), hr = h.getBoundingClientRect(),",
-    "        tr = t.getBoundingClientRect(), ts = getComputedStyle(t), hs = getComputedStyle(h);",
-    "  const lh = parseFloat(ts.lineHeight);",
-    "  console.table({",
-    "    scrollY: Math.round(scrollY),",
-    "    innerWidth, innerHeight, clientHeight: document.documentElement.clientHeight,",
-    "    headerHeight: Math.round(hdr.height), headerBottom: Math.round(hdr.bottom),",
-    "    heroTop: Math.round(hr.top), heroHeight: Math.round(hr.height),",
-    "    heroMinHeight: hs.minHeight, heroPaddingTop: hs.paddingTop,",
-    "    heroMarginTop: hs.marginTop, heroOverflow: hs.overflow, heroAlign: hs.alignItems,",
-    "    h1Top: Math.round(tr.top), h1Height: Math.round(tr.height),",
-    "    h1FontSize: ts.fontSize, h1LineHeight: ts.lineHeight,",
-    "    h1Lines: Math.round(tr.height / lh),",
-    "    clearance: Math.round(tr.top - hdr.bottom),",
-    "    hiddenAbove: Math.max(0, Math.round(-tr.top))",
-    "  });",
+    "  const hd = q('.site-header'), m = q('main'),",
+    "        h = q('.hero-cover'), t = q('.hero-cover h1');",
+    "  if (!hd || !m) return console.warn('selectors not found');",
+    "  const sy = scrollY;",
+    "  const hdr = hd.getBoundingClientRect();",
+    "  const mr = m.getBoundingClientRect();",
+    "  const out = {",
+    "    scrollY: Math.round(sy), innerWidth,",
+    "    clientHeight: document.documentElement.clientHeight,",
+    "    mainPaddingTop: getComputedStyle(m).paddingTop,",
+    "    mainTop_doc: Math.round(mr.top + sy),",
+    "    headerHeight: Math.round(hdr.height),",
+    "    headerBottom: Math.round(hdr.bottom)",
+    "  };",
+    "  if (h && t) {",
+    "    const hr = h.getBoundingClientRect(), tr = t.getBoundingClientRect();",
+    "    const hs = getComputedStyle(h), ts = getComputedStyle(t);",
+    "    Object.assign(out, {",
+    "      heroTop_doc: Math.round(hr.top + sy),",
+    "      heroHeight: Math.round(hr.height),",
+    "      heroMinHeight: hs.minHeight, heroPaddingTop: hs.paddingTop,",
+    "      heroMarginTop: hs.marginTop, heroAlign: hs.alignItems,",
+    "      h1Top_doc: Math.round(tr.top + sy),",
+    "      h1Height: Math.round(tr.height),",
+    "      h1FontSize: ts.fontSize, h1LineHeight: ts.lineHeight,",
+    "      h1Lines: Math.round(tr.height / parseFloat(ts.lineHeight)),",
+    "      clearance: Math.round(tr.top - hdr.bottom)",
+    "    });",
+    "  }",
+    "  console.table(out);",
+    "  return out;",
     "})()"
   ].join("\n");
 
@@ -386,11 +480,10 @@
       setTimeout(function () { btn.textContent = label; }, 1800);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(
-        function () { done(true); }, function () { done(false); });
+      navigator.clipboard.writeText(text)
+        .then(function () { done(true); }, function () { done(false); });
     } else {
-      var ta = $("rep");
-      var prev = ta.value;
+      var ta = $("rep"), prev = ta.value;
       ta.value = text;
       ta.removeAttribute("readonly");
       ta.select();
@@ -402,53 +495,66 @@
     }
   }
 
-  $("b-hotfix").addEventListener("click", function () {
-    var link = document.getElementById("dx-hotfix");
-    link.disabled = !link.disabled;
-    this.dataset.on = String(!link.disabled);
-    this.textContent = link.disabled ? "Hotfix off" : "Hotfix ON";
-    setTimeout(measure, 60);   // let the cascade settle
+  $("b-scan").addEventListener("click", measure);
+
+  $("b-top").addEventListener("click", function () {
+    window.scrollTo(0, 0);
+    setTimeout(measure, 120);
   });
 
-  $("b-menu").addEventListener("click", function () {
+  $("b-fold").addEventListener("click", function () {
+    var w = $("wrap");
+    var c = w.dataset.collapsed === "true";
+    w.dataset.collapsed = String(!c);
+    this.textContent = c ? "Hide" : "Show";
+  });
+
+  $("b-copy").addEventListener("click", function () {
+    copy($("rep").value, this, "Copy report");
+  });
+
+  $("b-probe").addEventListener("click", function () {
+    copy(LIVE_PROBE, this, "Copy live probe");
+  });
+
+  function toggleMenu() {
     var nav = document.querySelector(".site-nav");
     var open = nav.classList.toggle("open");
     document.querySelector(".nav-toggle").setAttribute("aria-expanded", String(open));
-    this.dataset.on = String(open);
-    this.textContent = open ? "Menu OPEN" : "Menu closed";
-    setTimeout(measure, 60);
-  });
-
-  $("b-scan").addEventListener("click", measure);
-  $("b-copy").addEventListener("click", function () { copy($("rep").value, this, "Copy report"); });
-  $("b-probe").addEventListener("click", function () { copy(LIVE_PROBE, this, "Copy live probe"); });
-
-  /* The page's own hamburger must keep working — this harness does not ship
-     the site's JS, so wire it to the same class the real script toggles. */
-  document.querySelector(".nav-toggle").addEventListener("click", function () {
-    var nav = document.querySelector(".site-nav");
-    var open = nav.classList.toggle("open");
-    this.setAttribute("aria-expanded", String(open));
     var b = $("b-menu");
     b.dataset.on = String(open);
     b.textContent = open ? "Menu OPEN" : "Menu closed";
     setTimeout(measure, 60);
-  });
+  }
+
+  $("b-menu").addEventListener("click", toggleMenu);
+  document.querySelector(".nav-toggle").addEventListener("click", toggleMenu);
+
+  /* ---------- re-measure triggers ---------- */
+
+  var queued = false;
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { queued = false; measure(); });
+  }
 
   ["resize", "orientationchange", "scroll"].forEach(function (e) {
-    window.addEventListener(e, function () { requestAnimationFrame(measure); },
-                            { passive: true });
+    window.addEventListener(e, schedule, { passive: true });
   });
   if (window.visualViewport) {
-    visualViewport.addEventListener("resize", measure);
+    visualViewport.addEventListener("resize", schedule);
   }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-  window.addEventListener("load", measure);
 
-  // Sync the button label with the ?hotfixOn= state, then take a first reading.
-  var hf = document.getElementById("dx-hotfix");
-  $("b-hotfix").dataset.on = String(!hf.disabled);
-  $("b-hotfix").textContent = hf.disabled ? "Hotfix off" : "Hotfix ON";
+  /* Stylesheets may still be in flight at first paint. Measure on load, and
+     again shortly after, so a slow CDN cannot produce a false reading. */
+  window.addEventListener("load", function () {
+    measure();
+    setTimeout(measure, 400);
+    setTimeout(measure, 1500);
+  });
+
   measure();
 })();
 </script>
