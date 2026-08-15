@@ -115,11 +115,13 @@ function convert() {
       const month   = document.getElementById('monthInput').value.trim();
       const year    = document.getElementById('yearInput').value.trim();
       const isRtf   = file.name.toLowerCase().endsWith('.rtf');
+      apostropheFixes = 0;
       const csv     = isRtf ? parseRtf(text, month, year) : parseHtml(text, month, year);
       const dataRows = csv.split('\n').filter(l => l && !l.startsWith('#') && !l.startsWith('/')).length;
       document.getElementById('csvOutput').value = csv;
       document.getElementById('outputBox').style.display = '';
-      setStatus('Done — ' + dataRows + ' data rows converted.', false);
+      setStatus('Done — ' + dataRows + ' data rows converted.'
+        + (apostropheFixes ? ' ' + apostropheFixes + ' apostrophe(s) replaced with \u2019 to keep rows parseable.' : ''), false);
     } catch (err) {
       setStatus('Error: ' + err.message, true);
     }
@@ -478,12 +480,28 @@ function segsToMarkup(segs) {
 // Shared helper
 // =============================================================================
 
+// The schedule renderer quotes fields with the ASCII apostrophe and toggles
+// quote state on every one it meets, so an apostrophe inside a field silently
+// breaks the row: it parses to fewer than 5 fields and is dropped from the
+// table without any error. There is no escape syntax to fall back on, so the
+// converter normalises to the typographic apostrophe (U+2019), which renders
+// identically and is inert to the parser.
+let apostropheFixes = 0;
+
+function sanitizeField(text) {
+  const s = String(text == null ? '' : text);
+  const hits = (s.match(/'/g) || []).length;
+  if (!hits) return s;
+  apostropheFixes += hits;
+  return s.replace(/'/g, '\u2019');
+}
+
 // Convert 5 fields to one CSV row.
 // Field 0 (day number) is unquoted when it is a plain integer.
 function rowToCsv(fields) {
   const day   = fields[0];
   const isNum = /^\d+$/.test(day);
-  return fields.map((f, i) => (i === 0 && isNum) ? day : "'" + f + "'").join(',');
+  return fields.map((f, i) => (i === 0 && isNum) ? day : "'" + sanitizeField(f) + "'").join(',');
 }
 </script>
 </body>

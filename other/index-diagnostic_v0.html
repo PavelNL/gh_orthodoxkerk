@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Viewport diagnostic</title>
+<style>
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+
+    --bg:      #0d1117;
+    --panel:   #161b22;
+    --line:    #30363d;
+    --ink:     #e6edf3;
+    --dim:     #8b949e;
+    --ok:      #3fb950;
+    --warn:    #d29922;
+    --bad:     #f85149;
+    --accent:  #58a6ff;
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 15px/1.5 var(--mono);
+    padding: max(12px, var(--sat)) max(12px, var(--sar)) max(24px, var(--sab)) max(12px, var(--sal));
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1.page-title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    margin: 0 0 4px;
+  }
+
+  p.lede {
+    color: var(--dim);
+    font-size: 13px;
+    margin: 0 0 16px;
+  }
+
+  section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin: 0 0 12px;
+    overflow: hidden;
+  }
+
+  section > h2 {
+    background: #1f2630;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    margin: 0;
+    padding: 8px 10px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .rows { padding: 4px 0; }
+
+  .row {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 10px;
+    font-size: 13px;
+  }
+  .row + .row { border-top: 1px solid rgba(48,54,61,.5); }
+  .row .k { color: var(--dim); flex: 0 1 auto; }
+  .row .v { color: var(--ink); text-align: right; word-break: break-all; }
+
+  .v.ok   { color: var(--ok); }
+  .v.warn { color: var(--warn); }
+  .v.bad  { color: var(--bad); }
+
+  .verdict {
+    padding: 10px;
+    font-size: 13px;
+    line-height: 1.45;
+    border-top: 1px solid var(--line);
+  }
+  .verdict b { color: var(--accent); }
+  .verdict ul { margin: 6px 0 0; padding-left: 18px; }
+  .verdict li { margin: 3px 0; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  button {
+    appearance: none;
+    background: #21262d;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    min-height: 44px;
+    padding: 0 14px;
+    flex: 1 1 auto;
+  }
+  button:active { background: #2d333b; }
+  button[aria-pressed="true"] {
+    background: #1f6feb;
+    border-color: #1f6feb;
+    color: #fff;
+  }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- Hero replica: reproduces the suspected failure mode ---- */
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: #11161d;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    opacity: .35;
+  }
+
+  /* Mode A — the bug pattern: full-viewport vh box + negative offset on the title */
+  .hero[data-mode="broken"] {
+    height: 100vh;
+    display: block;
+  }
+  .hero[data-mode="broken"] .hero-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-top: -6vh;
+    font-size: 9vw;
+    line-height: 1.05;
+    text-align: center;
+    padding: 0 12px;
+  }
+
+  /* Mode B — the fix: small-viewport unit, flow layout, no negative offset */
+  .hero[data-mode="fixed"] {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding-block: clamp(16px, 5svh, 48px);
+    padding-top: max(16px, var(--sat));
+  }
+  .hero[data-mode="fixed"] .hero-title {
+    position: static;
+    margin: 0;
+    font-size: clamp(24px, 6vw, 56px);
+    line-height: 1.15;
+    text-align: center;
+    padding: 0 12px;
+    text-wrap: balance;
+  }
+
+  .hero-title {
+    position: relative;
+    z-index: 1;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+
+  .clip-flag {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-align: center;
+  }
+  .clip-flag[data-state="visible"] { background: #12331d; color: var(--ok); }
+  .clip-flag[data-state="clipped"] { background: #3d1416; color: var(--bad); }
+
+  #report {
+    width: 100%;
+    min-height: 220px;
+    background: #0b0f14;
+    border: 0;
+    border-top: 1px solid var(--line);
+    color: var(--dim);
+    font: 12px/1.4 var(--mono);
+    padding: 10px;
+    resize: vertical;
+    white-space: pre;
+  }
+
+  footer {
+    color: var(--dim);
+    font-size: 12px;
+    padding: 8px 2px 0;
+  }
+  footer a { color: var(--accent); }
+
+  .probe-cage {
+    position: absolute;
+    left: -10000px;
+    top: 0;
+    width: 1px;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Viewport diagnostic</h1>
+<p class="lede">Open on each device, compare the readouts, then copy the report.</p>
+
+<!-- Live-updating probes; heights are viewport-relative so the 0-height cage doesn't affect them -->
+<div class="probe-cage" aria-hidden="true">
+  <div id="probe-vh"  style="height:100vh"></div>
+  <div id="probe-svh" style="height:100svh"></div>
+  <div id="probe-lvh" style="height:100lvh"></div>
+  <div id="probe-dvh" style="height:100dvh"></div>
+  <div id="probe-font" style="font-size:16px">M</div>
+  <div id="probe-boost" style="width:2000px;font-size:16px">Font boosting probe text used to detect Android text autosizing.</div>
+</div>
+
+<section>
+  <h2>Reproduction</h2>
+  <div class="controls">
+    <button id="mode-broken" aria-pressed="true">Suspect pattern</button>
+    <button id="mode-fixed" aria-pressed="false">Candidate fix</button>
+  </div>
+  <div class="clip-flag" id="clip-flag" data-state="visible">measuring…</div>
+  <div class="hero" id="hero" data-mode="broken">
+    <img class="hero-img" alt=""
+         src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 1200'%3E%3Crect width='800' height='1200' fill='%23223'/%3E%3Cg fill='none' stroke='%23456' stroke-width='2'%3E%3Cpath d='M0 0h800v1200H0z'/%3E%3Cpath d='M0 100h800M0 300h800M0 500h800M0 700h800M0 900h800M0 1100h800'/%3E%3C/g%3E%3C/svg%3E">
+    <h2 class="hero-title" id="hero-title">Kerk van de Heilige Grootvorst Alexander Nevski</h2>
+  </div>
+  <div class="rows" id="hero-rows"></div>
+</section>
+
+<section>
+  <h2>Viewport</h2>
+  <div class="rows" id="viewport-rows"></div>
+</section>
+
+<section>
+  <h2>Viewport units</h2>
+  <div class="rows" id="units-rows"></div>
+</section>
+
+<section>
+  <h2>Safe area</h2>
+  <div class="rows" id="safe-rows"></div>
+</section>
+
+<section>
+  <h2>Text scaling &amp; fonts</h2>
+  <div class="rows" id="text-rows"></div>
+</section>
+
+<section>
+  <h2>Device</h2>
+  <div class="rows" id="device-rows"></div>
+</section>
+
+<section>
+  <h2>Clipped elements</h2>
+  <div class="rows" id="clip-rows"></div>
+  <div class="verdict" id="verdict"></div>
+</section>
+
+<section>
+  <h2>Report</h2>
+  <div class="controls">
+    <button id="copy-report">Copy report</button>
+    <button id="refresh">Re-measure</button>
+  </div>
+  <textarea id="report" readonly spellcheck="false"></textarea>
+</section>
+
+<footer>
+  Scroll down and back up after loading — the URL bar collapse is what changes <code>vh</code>.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var px = function (n) { return Math.round(n * 100) / 100 + "px"; };
+  var state = {};
+
+  /* ---------- rendering helpers ---------- */
+
+  function render(container, pairs) {
+    var html = "";
+    for (var i = 0; i < pairs.length; i++) {
+      var k = pairs[i][0], v = pairs[i][1], cls = pairs[i][2] || "";
+      html += '<div class="row"><span class="k">' + k + '</span>' +
+              '<span class="v ' + cls + '">' + v + '</span></div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function supports(prop, value) {
+    return window.CSS && CSS.supports ? CSS.supports(prop, value) : false;
+  }
+
+  /* ---------- measurements ---------- */
+
+  function readUnits() {
+    return {
+      vh:  $("probe-vh").offsetHeight,
+      svh: supports("height", "100svh") ? $("probe-svh").offsetHeight : null,
+      lvh: supports("height", "100lvh") ? $("probe-lvh").offsetHeight : null,
+      dvh: supports("height", "100dvh") ? $("probe-dvh").offsetHeight : null
+    };
+  }
+
+  function readSafeArea() {
+    var cs = getComputedStyle(document.documentElement);
+    return {
+      top:    cs.getPropertyValue("--sat").trim() || "0px",
+      right:  cs.getPropertyValue("--sar").trim() || "0px",
+      bottom: cs.getPropertyValue("--sab").trim() || "0px",
+      left:   cs.getPropertyValue("--sal").trim() || "0px"
+    };
+  }
+
+  function readTextScale() {
+    var base  = parseFloat(getComputedStyle($("probe-font")).fontSize);
+    var boost = parseFloat(getComputedStyle($("probe-boost")).fontSize);
+    return {
+      declared: 16,
+      computed: base,
+      ratio: base / 16,
+      boosted: boost,
+      boostRatio: boost / 16
+    };
+  }
+
+  function capHeight(fontSpec, glyph) {
+    try {
+      var c = document.createElement("canvas").getContext("2d");
+      c.font = fontSpec;
+      var m = c.measureText(glyph || "H");
+      if (typeof m.actualBoundingBoxAscent !== "number") return null;
+      return Math.round((m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) * 100) / 100;
+    } catch (e) { return null; }
+  }
+
+  function scanClipped() {
+    var out = [];
+    var nodes = document.body.querySelectorAll("*");
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (el.closest(".probe-cage")) continue;
+      var cs = getComputedStyle(el);
+      if (cs.visibility === "hidden" || cs.display === "none") continue;
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      // Only meaningful while the document is at scroll origin.
+      if (r.top < -1 || r.left < -1 || r.right > document.documentElement.clientWidth + 1) {
+        out.push({
+          sel: el.tagName.toLowerCase() +
+               (el.id ? "#" + el.id : "") +
+               (el.className && typeof el.className === "string"
+                 ? "." + el.className.trim().split(/\s+/).slice(0, 2).join(".")
+                 : ""),
+          top: Math.round(r.top),
+          left: Math.round(r.left),
+          right: Math.round(r.right)
+        });
+      }
+    }
+    return out;
+  }
+
+  /* ---------- panels ---------- */
+
+  function paintViewport() {
+    var vv = window.visualViewport;
+    var doc = document.documentElement;
+    state.viewport = {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      clientWidth: doc.clientWidth,
+      clientHeight: doc.clientHeight,
+      vvWidth: vv ? Math.round(vv.width) : null,
+      vvHeight: vv ? Math.round(vv.height) : null,
+      vvScale: vv ? Math.round(vv.scale * 1000) / 1000 : null,
+      vvOffsetTop: vv ? Math.round(vv.offsetTop) : null,
+      scrollY: Math.round(window.scrollY),
+      dpr: window.devicePixelRatio
+    };
+    var s = state.viewport;
+    var zoomCls = (s.vvScale !== null && Math.abs(s.vvScale - 1) > 0.01) ? "warn" : "";
+
+    render($("viewport-rows"), [
+      ["innerWidth",            s.innerWidth + "px"],
+      ["innerHeight",           s.innerHeight + "px"],
+      ["documentElement.clientWidth",  s.clientWidth + "px"],
+      ["documentElement.clientHeight", s.clientHeight + "px"],
+      ["visualViewport",        s.vvWidth === null ? "unsupported" : s.vvWidth + " × " + s.vvHeight],
+      ["visualViewport.scale",  s.vvScale === null ? "—" : s.vvScale, zoomCls],
+      ["visualViewport.offsetTop", s.vvOffsetTop === null ? "—" : s.vvOffsetTop + "px"],
+      ["scrollY",               s.scrollY + "px"],
+      ["devicePixelRatio",      s.dpr],
+      ["layout px per device px", Math.round(screen.width / s.innerWidth * 1000) / 1000]
+    ]);
+  }
+
+  function paintUnits() {
+    var u = readUnits();
+    state.units = u;
+    var gap = (u.lvh !== null && u.svh !== null) ? u.lvh - u.svh : null;
+    render($("units-rows"), [
+      ["100vh",  u.vh + "px"],
+      ["100svh", u.svh === null ? "unsupported" : u.svh + "px", u.svh === null ? "warn" : ""],
+      ["100lvh", u.lvh === null ? "unsupported" : u.lvh + "px"],
+      ["100dvh", u.dvh === null ? "unsupported" : u.dvh + "px"],
+      ["lvh − svh (toolbar height)", gap === null ? "—" : gap + "px", gap > 0 ? "warn" : "ok"],
+      ["vh resolves to", u.vh === u.lvh ? "large viewport" : (u.vh === u.svh ? "small viewport" : "other"),
+        u.vh === u.lvh ? "warn" : ""]
+    ]);
+  }
+
+  function paintSafe() {
+    var sa = readSafeArea();
+    state.safe = sa;
+    var any = ["top", "right", "bottom", "left"].some(function (k) {
+      return parseFloat(sa[k]) > 0;
+    });
+    render($("safe-rows"), [
+      ["inset-top",    sa.top,    parseFloat(sa.top) > 0 ? "warn" : ""],
+      ["inset-right",  sa.right],
+      ["inset-bottom", sa.bottom],
+      ["inset-left",   sa.left],
+      ["viewport-fit", "cover (set on this page)"],
+      ["cutout present", any ? "yes" : "no", any ? "warn" : "ok"]
+    ]);
+  }
+
+  function paintText() {
+    var t = readTextScale();
+    state.text = t;
+    var titleCs = getComputedStyle($("hero-title"));
+    var spec = titleCs.fontStyle + " " + titleCs.fontWeight + " " +
+               titleCs.fontSize + "/" + titleCs.lineHeight + " " + titleCs.fontFamily;
+    var cap = capHeight(titleCs.fontWeight + " " + titleCs.fontSize + " " + titleCs.fontFamily, "K");
+    state.text.titleFont = spec;
+    state.text.titleCap = cap;
+
+    var scaled = Math.abs(t.ratio - 1) > 0.01;
+    var boosted = Math.abs(t.boostRatio - t.ratio) > 0.01;
+
+    render($("text-rows"), [
+      ["declared 16px computes to", px(t.computed), scaled ? "bad" : "ok"],
+      ["user text scale",           Math.round(t.ratio * 100) + "%", scaled ? "bad" : "ok"],
+      ["font boosting (autosize)",  boosted ? "ACTIVE — " + px(t.boosted) : "off", boosted ? "bad" : "ok"],
+      ["title computed font",       spec],
+      ["title cap+descent (K)",     cap === null ? "unmeasurable" : cap + "px"],
+      ["fonts.ready",               document.fonts && document.fonts.status ? document.fonts.status : "n/a"]
+    ]);
+  }
+
+  function paintDevice() {
+    var rows = [
+      ["userAgent", navigator.userAgent],
+      ["platform", navigator.platform || "—"],
+      ["screen", screen.width + " × " + screen.height],
+      ["screen avail", screen.availWidth + " × " + screen.availHeight],
+      ["orientation", (screen.orientation && screen.orientation.type) || "—"],
+      ["maxTouchPoints", navigator.maxTouchPoints],
+      ["prefers-reduced-motion", matchMedia("(prefers-reduced-motion: reduce)").matches ? "reduce" : "no-preference"],
+      ["prefers-color-scheme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"]
+    ];
+    state.device = {};
+    for (var i = 0; i < rows.length; i++) state.device[rows[i][0]] = rows[i][1];
+    render($("device-rows"), rows);
+
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      navigator.userAgentData
+        .getHighEntropyValues(["model", "platform", "platformVersion", "fullVersionList"])
+        .then(function (ua) {
+          state.device.model = ua.model || "—";
+          state.device.platformVersion = ua.platform + " " + ua.platformVersion;
+          state.device.brands = (ua.fullVersionList || [])
+            .map(function (b) { return b.brand + " " + b.version; }).join(", ");
+          rows.push(["UA-CH model", state.device.model]);
+          rows.push(["UA-CH platform", state.device.platformVersion]);
+          rows.push(["UA-CH brands", state.device.brands]);
+          render($("device-rows"), rows);
+          writeReport();
+        })
+        .catch(function () {});
+    }
+  }
+
+  function paintHero() {
+    var hero = $("hero");
+    var title = $("hero-title");
+    var hr = hero.getBoundingClientRect();
+    var tr = title.getBoundingClientRect();
+    var cs = getComputedStyle(title);
+    var clipped = tr.top < 0;
+
+    state.hero = {
+      mode: hero.dataset.mode,
+      heroHeight: Math.round(hr.height),
+      heroTop: Math.round(hr.top),
+      titleTop: Math.round(tr.top),
+      titleHeight: Math.round(tr.height),
+      titleMarginTop: cs.marginTop,
+      titleFontSize: cs.fontSize,
+      titlePosition: cs.position,
+      hiddenPx: clipped ? Math.round(-tr.top) : 0
+    };
+
+    render($("hero-rows"), [
+      ["mode",                state.hero.mode],
+      ["hero height",         state.hero.heroHeight + "px"],
+      ["title position",      state.hero.titlePosition],
+      ["title margin-top",    state.hero.titleMarginTop],
+      ["title font-size",     state.hero.titleFontSize],
+      ["title rect.top",      state.hero.titleTop + "px", clipped ? "bad" : "ok"],
+      ["hidden above viewport", state.hero.hiddenPx + "px", clipped ? "bad" : "ok"]
+    ]);
+
+    var flag = $("clip-flag");
+    if (clipped) {
+      flag.dataset.state = "clipped";
+      flag.textContent = "CLIPPED — " + state.hero.hiddenPx + "px of the title is above the viewport";
+    } else {
+      flag.dataset.state = "visible";
+      flag.textContent = "Title fully visible (top = " + state.hero.titleTop + "px)";
+    }
+  }
+
+  function paintClipScan() {
+    var hits = scanClipped();
+    state.clipped = hits;
+    if (window.scrollY > 2) {
+      render($("clip-rows"), [["scan", "scroll to top to run", "warn"]]);
+    } else if (!hits.length) {
+      render($("clip-rows"), [["elements outside viewport bounds", "none", "ok"]]);
+    } else {
+      render($("clip-rows"), hits.slice(0, 12).map(function (h) {
+        return [h.sel, "top " + h.top + " / right " + h.right, "bad"];
+      }));
+    }
+    paintVerdict();
+  }
+
+  function paintVerdict() {
+    var u = state.units || {}, t = state.text || {}, s = state.safe || {}, v = state.viewport || {};
+    var notes = [];
+
+    if (u.svh !== null && u.lvh !== null && u.vh === u.lvh && u.lvh > u.svh) {
+      notes.push("<b>vh resolves to the large viewport</b> (" + u.vh + "px) while only " +
+                 u.svh + "px is visible on load — a " + (u.lvh - u.svh) +
+                 "px overshoot. Any full-height hero using <code>vh</code> pushes content off the top.");
+    }
+    if (t.ratio && Math.abs(t.ratio - 1) > 0.01) {
+      notes.push("<b>System text scaling is active at " + Math.round(t.ratio * 100) +
+                 "%.</b> Fixed-height containers and negative offsets tuned at 100% will overflow here.");
+    }
+    if (t.boostRatio && Math.abs(t.boostRatio - (t.ratio || 1)) > 0.01) {
+      notes.push("<b>Android font boosting is active.</b> Text is being resized independently of your CSS.");
+    }
+    if (parseFloat(s.top || "0") > 0) {
+      notes.push("<b>A display cutout of " + s.top +
+                 " is present.</b> With <code>viewport-fit=cover</code> and no " +
+                 "<code>env(safe-area-inset-top)</code> padding, that much content sits under the status bar.");
+    }
+    if (v.vvScale && Math.abs(v.vvScale - 1) > 0.01) {
+      notes.push("<b>The page is zoomed (scale " + v.vvScale +
+                 ").</b> Reset zoom before trusting the other numbers.");
+    }
+    if (state.hero && state.hero.hiddenPx > 0) {
+      notes.push("<b>Reproduced:</b> " + state.hero.hiddenPx +
+                 "px of the heading is currently above the viewport in mode “" + state.hero.mode + "”.");
+    }
+
+    $("verdict").innerHTML = notes.length
+      ? "<ul><li>" + notes.join("</li><li>") + "</li></ul>"
+      : "No clipping conditions detected in this configuration. Rotate, scroll, and re-run before concluding.";
+  }
+
+  /* ---------- report ---------- */
+
+  function writeReport() {
+    var lines = [];
+    lines.push("=== viewport diagnostic " + new Date().toISOString() + " ===");
+    lines.push("url: " + location.href);
+    lines.push("");
+    lines.push("[device]");
+    Object.keys(state.device || {}).forEach(function (k) {
+      lines.push("  " + k + ": " + state.device[k]);
+    });
+    lines.push("");
+    lines.push("[viewport]");
+    Object.keys(state.viewport || {}).forEach(function (k) {
+      lines.push("  " + k + ": " + state.viewport[k]);
+    });
+    lines.push("");
+    lines.push("[units]");
+    Object.keys(state.units || {}).forEach(function (k) {
+      lines.push("  100" + k + ": " + state.units[k]);
+    });
+    lines.push("");
+    lines.push("[safe-area]");
+    Object.keys(state.safe || {}).forEach(function (k) {
+      lines.push("  " + k + ": " + state.safe[k]);
+    });
+    lines.push("");
+    lines.push("[text]");
+    Object.keys(state.text || {}).forEach(function (k) {
+      lines.push("  " + k + ": " + state.text[k]);
+    });
+    lines.push("");
+    lines.push("[hero]");
+    Object.keys(state.hero || {}).forEach(function (k) {
+      lines.push("  " + k + ": " + state.hero[k]);
+    });
+    lines.push("");
+    lines.push("[clipped elements]");
+    if (!(state.clipped || []).length) {
+      lines.push("  none");
+    } else {
+      state.clipped.forEach(function (h) {
+        lines.push("  " + h.sel + "  top=" + h.top + " left=" + h.left + " right=" + h.right);
+      });
+    }
+    $("report").value = lines.join("\n");
+  }
+
+  /* ---------- orchestration ---------- */
+
+  var queued = false;
+  function measureAll() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () {
+      queued = false;
+      paintViewport();
+      paintUnits();
+      paintSafe();
+      paintText();
+      paintHero();
+      paintClipScan();
+      writeReport();
+    });
+  }
+
+  function setMode(mode) {
+    $("hero").dataset.mode = mode;
+    $("mode-broken").setAttribute("aria-pressed", String(mode === "broken"));
+    $("mode-fixed").setAttribute("aria-pressed", String(mode === "fixed"));
+    measureAll();
+  }
+
+  $("mode-broken").addEventListener("click", function () { setMode("broken"); });
+  $("mode-fixed").addEventListener("click", function () { setMode("fixed"); });
+  $("refresh").addEventListener("click", measureAll);
+
+  $("copy-report").addEventListener("click", function () {
+    var ta = $("report");
+    var done = function (ok) {
+      var b = $("copy-report");
+      b.textContent = ok ? "Copied" : "Select the text manually";
+      setTimeout(function () { b.textContent = "Copy report"; }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(function () { done(true); },
+                                                   function () { done(false); });
+    } else {
+      ta.removeAttribute("readonly");
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      ta.setAttribute("readonly", "");
+      done(ok);
+    }
+  });
+
+  window.addEventListener("resize", measureAll);
+  window.addEventListener("orientationchange", measureAll);
+  window.addEventListener("scroll", measureAll, { passive: true });
+  if (window.visualViewport) {
+    visualViewport.addEventListener("resize", measureAll);
+    visualViewport.addEventListener("scroll", measureAll);
+  }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(measureAll);
+  }
+
+  paintDevice();
+  measureAll();
+
+  // Exposed so the same checks can be run from the console on the live site.
+  window.__vpDiag = { measureAll: measureAll, scanClipped: scanClipped, state: state };
+})();
+</script>
+</body>
+</html>
