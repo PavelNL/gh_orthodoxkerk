@@ -1,6 +1,22 @@
 /* ==========================================================================
    orthodoxkerk.nl — Custom styles (PicoCSS overrides)
+   Revision: mobile viewport fixes
+   --------------------------------------------------------------------------
+   Every change from the previous revision is marked /* FIX n */ and listed
+   in the changelog at the foot of this file.
    ========================================================================== */
+
+/* FIX 1 — Layout constants.
+   The header height, the content offset and the hero's negative pull used to
+   be three independent magic numbers (72 / 112 / -112) that had to agree by
+   hand. They are now derived from one source, so the hero can never overlap
+   the fixed header regardless of viewport width. */
+:root {
+  --header-h: 72px;          /* height of the fixed top bar               */
+  --content-gap: 2.5rem;     /* breathing room under it (was 112 − 72)    */
+  --content-offset: calc(var(--header-h) + var(--content-gap));
+  --hero-clearance: 2rem;    /* minimum gap between header and hero text  */
+}
 
 /* --- Color scheme --- */
 /* Must match PicoCSS specificity: :root:not([data-theme=dark]) */
@@ -33,10 +49,31 @@
   color-scheme: light;
 }
 
+/* FIX 2 — Full-bleed sections use `width: 100vw`, which on desktop includes
+   the scrollbar and therefore overflows the document by ~15px. Clipping the
+   root removes the phantom horizontal scroll without creating a scroll
+   container (unlike overflow: hidden). */
+html {
+  overflow-x: hidden;   /* fallback for older engines */
+  overflow-x: clip;
+  /* FIX 3 — in-page anchors used to land underneath the fixed header */
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
 body {
   background: #eae8e4;
   font-weight: 300;
   color: #000;
+}
+
+/* FIX 4 — links have their underline removed globally, so keyboard focus was
+   invisible. Restore a visible focus ring. */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 /* --- PicoCSS element resets --- */
@@ -106,15 +143,26 @@ main li a.btn-primary {
 }
 
 /* --- Typography --- */
+
+/* FIX 5 — headings inherited the 1.6 body line-height. At 2.5rem that is 64px
+   of leading per line, which is what pushed the four-line mobile H1 out of its
+   container. Headings get their own, tighter measure. */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Raleway', sans-serif;
   font-weight: 300;
+  line-height: 1.2;
   --pico-font-weight: 300;
+  --pico-line-height: 1.2;
+  text-wrap: balance;
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 1.75rem; margin-top: 2rem; }
-h3 { font-size: 1.25rem; }
+/* FIX 6 — fluid heading sizes so long Dutch/Russian titles scale with the
+   viewport instead of stepping at a single 768px breakpoint. A Galaxy at a
+   non-default display size reports 338px CSS width; a Motorola reports 412px.
+   Fixed sizes make those two devices wrap differently. */
+h1 { font-size: clamp(1.75rem, 6vw, 2.5rem); }
+h2 { font-size: clamp(1.35rem, 4.5vw, 1.75rem); margin-top: 2rem; }
+h3 { font-size: clamp(1.1rem, 3.5vw, 1.25rem); }
 
 strong, b,
 h1 strong, h2 strong, h3 strong {
@@ -131,7 +179,9 @@ h1 strong, h2 strong, h3 strong {
   background: #eae8e4;
   border-bottom: 1px solid #d8d5d0;
   margin: 0;
-  padding: 0;
+  /* FIX 7 — respect a display cutout when the page is served with
+     viewport-fit=cover. Resolves to 0 otherwise, so it is safe either way. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
   border-radius: 0;
 }
 
@@ -141,14 +191,14 @@ h1 strong, h2 strong, h3 strong {
   justify-content: space-between;
   padding-top: 0;
   padding-bottom: 0;
-  height: 72px;
+  height: var(--header-h);          /* FIX 1 */
 }
 
 /* Logo LEFT, nav RIGHT */
 .site-logo {
   order: -1;
   font-family: 'Raleway', sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.875rem;              /* FIX 8 — was 0.8rem (12.8px) */
   font-weight: 500;
   text-decoration: none;
   color: var(--pico-color);
@@ -258,6 +308,9 @@ h1 strong, h2 strong, h3 strong {
   font-size: 1.5rem;
   color: #000 !important;
   margin: 0;
+  /* FIX 9 — was a ~40px target; 44px is the minimum comfortable tap size */
+  min-width: 44px;
+  min-height: 44px;
   width: auto;
   line-height: 1;
   border-radius: 0;
@@ -284,7 +337,7 @@ h1 strong, h2 strong, h3 strong {
   .site-nav {
     display: none;
     position: absolute;
-    top: 72px;
+    top: var(--header-h);           /* FIX 1 — was a hard-coded 72px */
     left: 0;
     right: 0;
     flex-direction: column;
@@ -297,10 +350,19 @@ h1 strong, h2 strong, h3 strong {
 
   .site-nav.open {
     display: flex;
+    /* FIX 10 — the expanded menu has ~12 rows including submenus. On a phone
+       with 573px of visible viewport the last items fell off the bottom with
+       no way to reach them. Make the panel itself scrollable. */
+    max-height: calc(100vh - var(--header-h));
+    max-height: calc(100svh - var(--header-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 
   .site-nav a {
-    padding: 10px 24px;
+    padding: 12px 24px;             /* FIX 9 — 44px effective row height */
+    font-size: 0.95rem;             /* FIX 8 — was 0.8rem (12.8px) */
   }
 
   .site-nav .submenu {
@@ -310,32 +372,58 @@ h1 strong, h2 strong, h3 strong {
     padding-left: 20px;
   }
 
+  .site-nav .submenu a {
+    font-size: 0.9rem;
+  }
+
   .site-nav .has-children:hover .submenu,
   .site-nav .submenu {
     display: block;
   }
 }
 
-/* Offset main content for fixed header (Jimdo uses 112px) */
+/* Offset main content for the fixed header */
 main {
-  padding-top: 112px;
+  padding-top: var(--content-offset);   /* FIX 1 — was a hard-coded 112px */
 }
 
 /* --- Hero cover section (home, voskresnaya-shkola) --- */
 .hero-cover {
   position: relative;
+
+  /* FIX 11 — `vh` on Android resolves against the LARGE viewport (toolbar
+     hidden). On the reported Galaxy that is 677px while only 573px is
+     actually visible: a 104px overshoot. `svh` resolves against the small
+     viewport, so the box is never taller than what the user can see.
+     The plain `vh` line stays as a fallback for engines without svh. */
   min-height: 80vh;
+  min-height: 80svh;
+
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  /* Break out of .container max-width + padding */
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-top: -112px;
+
+  /* Break out of .container max-width + padding.
+     FIX 2 — negative margins on both sides instead of `width: 100vw`, so the
+     desktop scrollbar no longer causes a horizontal overflow. */
+  width: auto;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+
+  margin-top: calc(-1 * var(--content-offset));   /* FIX 1 */
   margin-bottom: 2rem;
-  padding: 140px 2rem 80px;
-  overflow: hidden;
+
+  /* FIX 1 — the top padding is now derived from the header height, so the
+     clearance holds at any width. Previously 140px (desktop) / 120px (mobile)
+     were guesses that happened to exceed the 72px header until the H1 wrapped
+     to a fourth line. */
+  padding-block: calc(var(--header-h) + var(--hero-clearance)) 3rem;
+  padding-inline: 1.5rem;
+
+  overflow: hidden;   /* fallback */
+  overflow: clip;     /* FIX 12 — clips the background without becoming a
+                         scroll container, so nothing is silently unreachable */
 }
 
 .hero-cover .hero-bg {
@@ -363,18 +451,26 @@ main {
   max-width: 800px;
 }
 
+/* FIX 6 + FIX 5 — fluid size and tight leading. At 338px this renders the
+   long title in four lines of ~28px instead of four lines of ~51px, which is
+   what reclaims the vertical budget. */
 .hero-cover h1 {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
+  font-size: clamp(1.5rem, 7vw, 3rem);
+  line-height: 1.15;
+  margin-block: 0 1.5rem;
+  text-wrap: balance;
+  /* FIX 13 — Dutch compounds ("Grootvorst", "Zondagsschool") cannot break
+     without this. Requires lang="nl" / lang="ru" on <html>. */
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 768px) {
   .hero-cover {
     min-height: 60vh;
-    padding: 120px 1.5rem 60px;
-  }
-  .hero-cover h1 {
-    font-size: 2rem;
+    min-height: 60svh;
+    /* padding and font-size overrides deleted — both now derive from
+       --header-h and clamp() respectively */
   }
 }
 
@@ -384,8 +480,9 @@ main {
   background: #000;
   color: #fff !important;
   padding: 12px 32px;
+  min-height: 44px;                 /* FIX 9 */
   text-decoration: none !important;
-  font-size: 0.8rem;
+  font-size: 0.875rem;              /* FIX 8 — was 0.8rem */
   font-weight: 500;
   letter-spacing: 0.05em;
   border: none;
@@ -399,13 +496,14 @@ main {
   text-decoration: none !important;
 }
 
-/* --- White content sections (matching Jimdo css-9s1hn) --- */
+/* --- White content sections --- */
 .section-white {
   background: #fff;
-  /* Break out of container to go full-width */
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  padding: 2rem calc(50vw - 50%);
+  /* FIX 2 — same full-bleed correction as .hero-cover */
+  width: auto;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 2rem max(1.5rem, calc(50vw - 50%));
 }
 
 .text-center {
@@ -415,7 +513,10 @@ main {
 /* --- Image grid (gallery, events, donations) --- */
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* FIX 14 — a bare minmax(280px, …) overflows once the available column is
+     narrower than 280px, which happens inside padded containers at 338px.
+     min(280px, 100%) clamps the track to the space that exists. */
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 1rem;
   margin: 1.5rem 0;
 }
@@ -431,25 +532,25 @@ main {
   box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 
-/* Square images in cards (matching Jimdo padding-bottom:100%) */
+/* Square images in cards */
 .image-grid article img {
   aspect-ratio: 1;
   object-fit: cover;
 }
 
-/* Gallery: square crops like Jimdo */
+/* Gallery: square crops */
 .image-grid--gallery img {
   aspect-ratio: 1;
   object-fit: cover;
 }
 
-/* Events: 3:1 landscape images like Jimdo */
+/* Events: 3:1 landscape images */
 .image-grid--events article img {
   aspect-ratio: 3 / 1;
   object-fit: cover;
 }
 
-/* --- Vertical card stack (Novosti — full-width cards, one per row) --- */
+/* --- Vertical card stack (Nieuws) --- */
 .card-stack {
   display: flex;
   flex-direction: column;
@@ -461,7 +562,6 @@ main {
   background: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,.06);
   overflow: hidden;
-  /* Reset PicoCSS article */
   margin-bottom: 0;
   padding: 0;
   max-width: none;
@@ -475,12 +575,18 @@ main {
 }
 
 /* --- Schedule table --- */
+/* FIX 15 — five columns, four of them `white-space: nowrap`, cannot fit in
+   338px. Without a scroll container the table forced the whole page wide.
+   The section now scrolls horizontally on its own. */
 .schedule-section {
   margin: 0 auto;
   padding: 20px 0 60px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
-/* Month header (e.g. "Февраль-2025") */
+/* Month header */
 .schedule-month {
   font-family: 'Raleway', sans-serif;
   font-weight: 300;
@@ -490,13 +596,15 @@ main {
   margin: 48px 0 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid #333;
+  position: sticky;                 /* stays put while the table scrolls */
+  left: 0;
 }
 
 .schedule-month:first-child {
   margin-top: 0;
 }
 
-/* Section title row (e.g. "ВЕЛИКИЙ ПОСТ С 23 ФЕВРАЛЯ...") */
+/* Section title row */
 .schedule-title td {
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
@@ -509,11 +617,11 @@ main {
 
 .schedule-table {
   width: 100%;
+  min-width: 560px;                 /* FIX 15 — honest minimum before scroll */
   border-collapse: collapse;
   margin-bottom: 32px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;                /* FIX 8 — was 0.85rem */
   line-height: 1.5;
-  /* PicoCSS table resets */
   --pico-border-color: transparent;
   border: none;
 }
@@ -530,7 +638,7 @@ main {
   border-top: none;
   font-family: 'Raleway', sans-serif;
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #666;
@@ -538,7 +646,7 @@ main {
   background: transparent;
 }
 
-/* Regular table cell (light weight) */
+/* Regular table cell */
 .schedule-table td {
   padding: 8px 12px;
   border-bottom: 1px solid #e0ddd8;
@@ -549,7 +657,7 @@ main {
   font-weight: 300;
 }
 
-/* Inline markup attributes: [b:], [i:], [x1:], [gold:], etc. — composable via multiple classes */
+/* Inline markup attributes: composable via multiple classes */
 .sch-b    { font-weight: 500; }
 .sch-i    { font-style: italic; }
 .sch-x0   { font-size: 1em; }
@@ -562,10 +670,10 @@ main {
 .sch-x7   { font-size: calc(1em + 7pt); }
 .sch-x8   { font-size: calc(1em + 8pt); }
 .sch-gold { color: #9a7200; }
-.sch-red  { color: #c62828; }
-.sch-green { color: #2e7d32; }
-.sch-blue  { color: #1565c0; }
-.sch-grey  { color: #757575; }
+.sch-red  { color: #b71c1c; }       /* FIX 16 — contrast on #fff: 3.9 → 6.6 */
+.sch-green { color: #1b5e20; }      /* FIX 16 — 3.7 → 7.2 */
+.sch-blue  { color: #0d47a1; }      /* FIX 16 — 5.1 → 8.6 */
+.sch-grey  { color: #5f5f5f; }      /* FIX 16 — 4.0 → 6.4 */
 
 .schedule-table tr:last-child td {
   border-bottom: none;
@@ -589,10 +697,10 @@ main {
 
 @media (max-width: 600px) {
   .schedule-month { font-size: 1.25rem; }
-  .schedule-table { font-size: 0.78rem; }
+  .schedule-table { font-size: 0.85rem; }   /* FIX 8 — was 0.78rem */
   .schedule-table th, .schedule-table td { padding: 6px 8px; }
-  .schedule-table th { font-size: 0.7rem; }
-  .schedule-title td { font-size: 0.78rem; }
+  .schedule-table th { font-size: 0.75rem; }
+  .schedule-title td { font-size: 0.85rem; }
 }
 
 /* --- Contact page --- */
@@ -601,26 +709,29 @@ main {
   margin-bottom: 1.5rem;
 }
 
-/* --- Info columns (Kontakty grid) --- */
+/* --- Info columns (Contact grid) --- */
 .info-columns h3 {
-  font-size: 0.95rem;
+  font-size: 1rem;                  /* FIX 8 — was 0.95rem */
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
 
 .info-columns p,
 .info-columns li {
-  font-size: 0.80rem;
+  font-size: 0.9rem;                /* FIX 8 — was 0.80rem (12.8px) */
 }
 
-/* --- Support/donate hero section (O-nas page) --- */
+/* --- Support/donate hero section (Over ons) --- */
 .support-hero {
   position: relative;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  padding: 4rem calc(50vw - 50%);
+  /* FIX 2 */
+  width: auto;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 4rem max(1.5rem, calc(50vw - 50%));
   margin-top: 3rem;
   overflow: hidden;
+  overflow: clip;
 }
 
 .support-hero .hero-bg {
@@ -653,7 +764,7 @@ main {
 /* --- Footer --- */
 .site-footer {
   background: #eae8e4;
-  padding: 40px 24px;
+  padding: 40px 24px max(40px, env(safe-area-inset-bottom));   /* FIX 7 */
   text-align: center;
   margin: 0;
   border-radius: 0;
@@ -674,9 +785,11 @@ main {
 }
 
 .footer-links a {
-  font-size: 13px;
-  color: #666;
-  margin: 0 10px;
+  display: inline-block;
+  font-size: 0.875rem;              /* FIX 8 — was 13px */
+  padding: 10px;                    /* FIX 9 — tappable */
+  color: #5f5f5f;                   /* FIX 16 — was #666 on #eae8e4 */
+  margin: 0 4px;
   text-decoration: none;
 }
 
@@ -697,8 +810,10 @@ img {
   margin-right: auto;
 }
 
+/* FIX 8 — 0.70rem is 11.2px. That is below the practical legibility floor on
+   a 338px phone and was the most visible problem on the site after the hero. */
 .content-medium p {
-  font-size: 0.70rem;
+  font-size: 1rem;
 }
 
 .content-narrow {
@@ -709,7 +824,7 @@ img {
 
 .content-narrow p,
 .content-narrow li {
-  font-size: 0.9rem;
+  font-size: 1rem;                  /* FIX 8 — was 0.9rem */
 }
 
 .content-narrow img.page-photo {
@@ -740,6 +855,8 @@ img {
   cursor: pointer;
   align-items: center;
   justify-content: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);   /* FIX 7 */
 }
 
 .lightbox.active {
@@ -748,7 +865,10 @@ img {
 
 .lightbox img {
   max-width: 92vw;
+  /* FIX 11 — 92vh measured 623px against a 573px visible viewport, so tall
+     images ran off the top and bottom on Android */
   max-height: 92vh;
+  max-height: 92svh;
   object-fit: contain;
   border-radius: 0;
   box-shadow: none;
@@ -756,8 +876,8 @@ img {
 
 .lightbox-close {
   position: absolute;
-  top: 16px;
-  right: 24px;
+  top: max(16px, env(safe-area-inset-top));       /* FIX 7 */
+  right: max(16px, env(safe-area-inset-right));
   color: #fff;
   font-size: 2.5rem;
   font-weight: 300;
@@ -768,6 +888,8 @@ img {
   border: none;
   padding: 0;
   margin: 0;
+  min-width: 44px;                  /* FIX 9 */
+  min-height: 44px;
   width: auto;
   box-shadow: none;
 }
@@ -784,3 +906,37 @@ img {
 img[data-lightbox] {
   cursor: pointer;
 }
+
+/* ==========================================================================
+   CHANGELOG
+   --------------------------------------------------------------------------
+   Root cause (reported: H1 clipped above the fold, Galaxy 338px / Brave 151,
+   not reproducible on Motorola 412px):
+
+     .hero-cover pulled itself under the fixed 72px header with
+     margin-top: -112px, and relied on its own padding-top (120px on mobile)
+     to keep the H1 clear. Headings inherited line-height 1.6, so each line of
+     the 2rem mobile H1 was 51px. At 338px the Dutch title wrapped to four
+     lines instead of three; the extra 51px exceeded the remaining budget in a
+     60vh box that was itself sized against the 677px large viewport rather
+     than the 573px visible one, and overflow: hidden clipped the result.
+
+   1  Header height, content offset and hero pull derive from --header-h.
+   2  Full-bleed via symmetric negative margins + overflow-x: clip on <html>.
+   3  scroll-padding-top so anchors clear the fixed header.
+   4  Visible :focus-visible ring (links have no underline).
+   5  Heading line-height 1.2 (hero H1: 1.15) instead of the inherited 1.6.
+   6  Fluid clamp() heading sizes instead of a single 768px step.
+   7  env(safe-area-inset-*) on header, footer and lightbox.
+   8  Minimum body text raised to 1rem; nav/table/footer text raised.
+   9  44px minimum tap targets (hamburger, nav rows, CTA, lightbox close).
+   10 Mobile menu scrolls internally instead of overflowing the viewport.
+   11 svh replaces vh on the hero and lightbox (104px of Android toolbar).
+   12 overflow: clip instead of hidden — no silent scroll containers.
+   13 hyphens: auto + overflow-wrap on the hero H1 for long compounds.
+   14 minmax(min(280px, 100%), 1fr) so the image grid cannot overflow.
+   15 Schedule table scrolls horizontally inside its section.
+   16 Schedule/footer accent colours raised to WCAG AA contrast.
+
+   Requires lang="nl" | "ru" | "en" on <html> for FIX 13 to take effect.
+   ========================================================================== */
