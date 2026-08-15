@@ -1,0 +1,53 @@
+/* ==========================================================================
+   orthodoxkerk.nl — HOTFIX: clipped hero H1 on narrow Android viewports
+   --------------------------------------------------------------------------
+   Append this AFTER custom.css. Changes nothing except the hero.
+   Deploy this first if you want to confirm the diagnosis before taking the
+   full custom.css revision. Delete the file to roll back.
+   ========================================================================== */
+
+:root {
+  --header-h: 72px;
+  --content-offset: 112px;   /* must equal the existing main { padding-top } */
+  --hero-clearance: 2rem;
+}
+
+.hero-cover {
+  /* vh resolves against Android's LARGE viewport (677px measured) while only
+     573px is visible on load. svh resolves against the visible one. */
+  min-height: 80vh;
+  min-height: 80svh;
+
+  margin-top: calc(-1 * var(--content-offset));
+
+  /* Clearance is now derived from the header height instead of guessed, so it
+     cannot be eaten by an extra wrapped line of the title. */
+  padding-block: calc(var(--header-h) + var(--hero-clearance)) 3rem;
+  padding-inline: 1.5rem;
+
+  overflow: clip;
+}
+
+.hero-cover h1 {
+  /* The decisive change: headings inherit line-height 1.6, so each line of the
+     2rem mobile H1 occupied 51px. Four lines at 338px overflowed the box. */
+  font-size: clamp(1.5rem, 7vw, 3rem);
+  line-height: 1.15;
+  margin-block: 0 1.5rem;
+  text-wrap: balance;
+  hyphens: auto;              /* needs lang="nl" on <html> */
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .hero-cover {
+    min-height: 60vh;
+    min-height: 60svh;
+    /* deliberately no padding or font-size override — both now derive from
+       --header-h and clamp() */
+    padding-block: calc(var(--header-h) + var(--hero-clearance)) 3rem;
+  }
+  .hero-cover h1 {
+    font-size: clamp(1.5rem, 7vw, 3rem);
+  }
+}
