@@ -1,53 +1,68 @@
 /* ==========================================================================
-   orthodoxkerk.nl — HOTFIX: clipped hero H1 on narrow Android viewports
+   orthodoxkerk.nl — HOTFIX (scoped)
    --------------------------------------------------------------------------
-   Append this AFTER custom.css. Changes nothing except the hero.
-   Deploy this first if you want to confirm the diagnosis before taking the
-   full custom.css revision. Delete the file to roll back.
+   Load AFTER custom.css. Every selector below begins with .hero-cover.
+   There are no :root, html, body, h1..h6, .site-header, .site-nav, .nav-toggle
+   or utility rules, so nothing outside the hero can be affected. Removing the
+   <link> restores the previous behaviour exactly.
+
+   Specificity note: .hero-cover h1 here has the same specificity as the rule
+   in custom.css, so this file MUST be linked after it to win the cascade.
    ========================================================================== */
 
-:root {
-  --header-h: 72px;
-  --content-offset: 112px;   /* must equal the existing main { padding-top } */
-  --hero-clearance: 2rem;
-}
-
 .hero-cover {
-  /* vh resolves against Android's LARGE viewport (677px measured) while only
-     573px is visible on load. svh resolves against the visible one. */
+  /* Locally scoped custom properties — declared on .hero-cover, not :root,
+     so no other component can read or collide with them. */
+  --hf-header-h: 72px;     /* keep in sync with .site-header .container height */
+  --hf-clearance: 2rem;    /* minimum gap wanted between header and hero text */
+
+  /* CHANGE 1 — viewport unit.
+     Measured on the reporting device: 100vh = 677px, 100svh = 573px.
+     `vh` resolves against Android's LARGE viewport (browser toolbar hidden),
+     so an 80vh/60vh hero is sized against 104px of space the user cannot see
+     on load. `svh` resolves against the visible viewport.
+     The plain `vh` line stays as a fallback for engines without svh. */
   min-height: 80vh;
   min-height: 80svh;
 
-  margin-top: calc(-1 * var(--content-offset));
-
-  /* Clearance is now derived from the header height instead of guessed, so it
-     cannot be eaten by an extra wrapped line of the title. */
-  padding-block: calc(var(--header-h) + var(--hero-clearance)) 3rem;
-  padding-inline: 1.5rem;
-
-  overflow: clip;
+  /* CHANGE 2 — clearance guard.
+     max() means this can only ever INCREASE the existing padding, never
+     reduce it. With the current 72px header it evaluates to 140px, i.e. it is
+     a no-op today; it exists so the clearance survives a future change to the
+     header height. */
+  padding-top: max(140px, calc(var(--hf-header-h) + var(--hf-clearance)));
 }
 
+/* CHANGE 3 — heading metrics.
+   Headings inherit --pico-line-height: 1.6 from the :root override. At the
+   2rem mobile size that is 51px of leading per line. 1.15 is appropriate for
+   display type and reclaims roughly a line and a half on a four-line title.
+   clamp() removes the single hard step at the 768px breakpoint, so a 338px
+   Galaxy and a 412px Motorola scale continuously instead of sharing one size. */
 .hero-cover h1 {
-  /* The decisive change: headings inherit line-height 1.6, so each line of the
-     2rem mobile H1 occupied 51px. Four lines at 338px overflowed the box. */
   font-size: clamp(1.5rem, 7vw, 3rem);
   line-height: 1.15;
   margin-block: 0 1.5rem;
   text-wrap: balance;
-  hyphens: auto;              /* needs lang="nl" on <html> */
   overflow-wrap: break-word;
+  hyphens: auto;           /* requires lang="nl" | "ru" | "en" on <html> */
 }
 
 @media (max-width: 768px) {
   .hero-cover {
     min-height: 60vh;
     min-height: 60svh;
-    /* deliberately no padding or font-size override — both now derive from
-       --header-h and clamp() */
-    padding-block: calc(var(--header-h) + var(--hero-clearance)) 3rem;
-  }
-  .hero-cover h1 {
-    font-size: clamp(1.5rem, 7vw, 3rem);
+    /* mobile clearance guard; evaluates to 120px with a 72px header, matching
+       the existing value, so again a no-op until --hf-header-h changes */
+    padding-top: max(120px, calc(var(--hf-header-h) + var(--hf-clearance)));
   }
 }
+
+/* --------------------------------------------------------------------------
+   Deliberately NOT changed, to keep the blast radius at zero:
+     overflow            — left as the existing `hidden`
+     width / margin-left — the 100vw full-bleed is untouched
+     margin-top          — the existing -112px is untouched
+     padding left/right/bottom — untouched (only padding-top is overridden)
+     everything outside .hero-cover
+   -------------------------------------------------------------------------- */
