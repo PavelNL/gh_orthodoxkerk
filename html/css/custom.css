@@ -317,9 +317,8 @@ h1 strong, h2 strong, h3 strong {
 }
 
 /* Offset main content for fixed header (Jimdo uses 112px) */
-main {
-  padding-top: 112px;
-}
+/* was:  main { padding-top: 112px; } — lost to Pico's body > main (0,0,2) */
+body > main { padding-top: 112px; }
 
 /* --- Hero cover section (home, voskresnaya-shkola) --- */
 .hero-cover {
