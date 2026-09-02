@@ -1,5 +1,5 @@
 All rights reserved by: 
-Alexander Nevskikerk, Schiedamsesingel 220, 3012 BA Rotterdam, Nederland
+Alexander Nevskikerk, Persijnstraat 16, 3021 RV Rotterdam, Nederland
 phone: +31 6 589 556 35 
 email: ruskerk.rdam@gmail.com
 
