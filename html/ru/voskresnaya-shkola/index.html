@@ -116,9 +116,22 @@
           <li>Православное богослужение</li>
           <li>Церковно-славянский язык</li>
         </ul>
-        <p style="margin-top:1.5rem;"><a href="#" class="btn-primary">Записаться</a></p>
+        <p style="margin-top:1.5rem;">
+          <button type="button" class="btn-primary" onclick="document.getElementById('enroll-dialog').showModal()">Записаться</button>
+        </p>
       </div>
     </section>
+
+    <dialog id="enroll-dialog" class="confirm-dialog">
+      <article>
+        <p>Для записи обратитесь к секретарю.<br>
+        Подробная информация на странице <a href="../o-nas/#kontaktnaya-informaciya">О нас</a>.<br></p>
+        <footer>
+          <button type="button" class="btn-secondary" onclick="document.getElementById('enroll-dialog').close()">Закрыть</button>
+          <a href="../o-nas/#kontaktnaya-informaciya" class="btn-primary">Контактная информация</a>
+        </footer>
+      </article>
+    </dialog>
 
     <h2 class="text-center">Расписание занятий</h2>
     <div class="schedule-section">
@@ -272,7 +285,7 @@
         <div style="padding:1.5rem;">
           <h3>Курсы</h3>
           <p>Хотите освоить базовые навыки, повысить свой уровень или начать заниматься на профессиональном уровне? У нас есть курсы для всех уровней подготовки. Не можете определиться? Свяжитесь с нами — мы с радостью поможем. Или запишитесь сегодня же на вводное занятие!</p>
-          <p><a href="#" class="btn-primary">Записаться</a></p>
+          <p><button type="button" class="btn-primary" onclick="document.getElementById('enroll-dialog').showModal()">Записаться</button></p>
         </div>
       </article>
 
@@ -281,7 +294,7 @@
         <div style="padding:1.5rem;">
           <h3>Средний уровень</h3>
           <p>Получите опыт.</p>
-          <p><a href="#" class="btn-primary">Записаться</a></p>
+          <p><button type="button" class="btn-primary" onclick="document.getElementById('enroll-dialog').showModal()">Записаться</button></p>
         </div>
       </article>
 
@@ -290,7 +303,7 @@
         <div style="padding:1.5rem;">
           <h3>Начинающие</h3>
           <p>Развивайте свои базовые навыки.</p>
-          <p><a href="#" class="btn-primary">Записаться</a></p>
+          <p><button type="button" class="btn-primary" onclick="document.getElementById('enroll-dialog').showModal()">Записаться</button></p>
         </div>
       </article>
     </div>
