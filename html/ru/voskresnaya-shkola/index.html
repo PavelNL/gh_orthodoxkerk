@@ -9,6 +9,66 @@
   <link href="../../css/pico.min.css" rel="stylesheet">
   <link href="../../css/custom.css" rel="stylesheet">
   <link href="../../fonts/fonts.css" rel="stylesheet">
+  <style>
+    /* Month accordion — same pattern as ru/raspisanie/ */
+    .schedule-month-block > summary { cursor: pointer; }
+    .schedule-month-block > summary > .schedule-month {
+      display: inline-block; margin: 0; vertical-align: middle;
+      font-size: 1rem; font-weight: 400; color: var(--pico-muted-color, #5f6b76);
+    }
+    .schedule-month__year { color: color-mix(in srgb, currentColor 65%, transparent); }
+    .schedule-month-block[open] > summary { margin-bottom: 1rem; }
+
+    /* One lesson date */
+    .lesson {
+      background: var(--pico-card-background-color, #fff);
+      box-shadow: var(--pico-card-box-shadow, 0 2px 8px rgba(0,0,0,.06));
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .lesson > h4 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0 0 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--pico-muted-border-color, #d8d5d0);
+    }
+    .lesson-groups {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .lesson-group h5 {
+      font-family: 'Raleway', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      margin: 0 0 .5rem;
+    }
+    .lesson-group h5 small {
+      font-weight: 400;
+      color: var(--pico-muted-color, #888);
+    }
+    .lesson-group ol { margin: 0; padding-left: 1.2rem; }
+    .lesson-group li { font-size: .85rem; margin-bottom: .4rem; }
+    .lesson-group li:last-child { margin-bottom: 0; }
+    .lesson-lead {
+      font-size: .85rem;
+      font-style: italic;
+      color: #555;
+      margin: 0 0 .5rem;
+    }
+    .lesson-note {
+      font-size: .85rem;
+      margin: 1rem 0 0;
+      padding-top: .75rem;
+      border-top: 1px solid var(--pico-muted-border-color, #d8d5d0);
+    }
+    /* Dates without lessons (holidays, joint lesson) */
+    .lesson--plain > h4 { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .lesson--plain p { font-size: .85rem; margin: .4rem 0 0; }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -59,6 +119,151 @@
         <p style="margin-top:1.5rem;"><a href="#" class="btn-primary">Записаться</a></p>
       </div>
     </section>
+
+    <h2 class="text-center">Расписание занятий</h2>
+    <div class="schedule-section">
+
+      <details class="schedule-month-block">
+        <summary><h3 class="schedule-month">Октябрь<span class="schedule-month__year">-2026</span></h3></summary>
+
+        <article class="lesson">
+          <h4>4 октября</h4>
+          <div class="lesson-groups">
+            <section class="lesson-group">
+              <h5>Младшая группа — Наталья Борисовна <small>(пом. София/Юлия Тран)</small></h5>
+              <p class="lesson-lead">Повторение: о Боге и Его свойствах (кратко).</p>
+              <ol>
+                <li>Кто сотворил мир? Мир есть творение Божие. Премудрое устройство окружающего мира. Понятие о Боге как о Творце. Владимир Лучанинов «Детям о Православии», «О Боге», стр. 2, 4.</li>
+                <li>Творческая часть.</li>
+              </ol>
+            </section>
+            <section class="lesson-group">
+              <h5>Старшая группа — Анастасия Валерьевна</h5>
+              <ol>
+                <li>Евангелие дня: <a href="https://days.pravoslavie.ru/bible/z_mf_18_23_35.html#z">Мф., 77 зач., XVIII, 23-35.</a></li>
+                <li>Ветхий Завет: Каин и Авель. Сиф. Беседа: наша свобода, в чем она? Зачем мы ходим в храм?</li>
+              </ol>
+            </section>
+          </div>
+        </article>
+
+        <article class="lesson">
+          <h4>11 октября</h4>
+          <div class="lesson-groups">
+            <section class="lesson-group">
+              <h5>Младшая группа — Ия Александровна <small>(пом. Анна ван дер Занде)</small></h5>
+              <p class="lesson-lead">Повторение о сотворении мира.</p>
+              <ol>
+                <li>Мир нерукотворный: о святых ангелах. Ангелы-хранители, молитва Ангелу-хранителю (священник Антоний Борисов «Детям о Православии», о Святых Ангелах).</li>
+                <li>Творческая часть.</li>
+              </ol>
+            </section>
+            <section class="lesson-group">
+              <h5>Старшая группа — Анна Йолинг</h5>
+              <ol>
+                <li>Евангелие дня: <a href="https://days.pravoslavie.ru/bible/z_lk_5_1_11.html#z">Лк., 17 зач., V, 1-11.</a></li>
+                <li>Ветхий Завет: Ной и Лот. Всемирный потоп. Беседа: забота христианина о своей душе (можно в кач. примера взять житие святителя Димитрия Ростовского). Подготовка к Празднику Покрова.</li>
+              </ol>
+            </section>
+          </div>
+        </article>
+
+        <article class="lesson lesson--plain">
+          <h4>18 октября</h4>
+          <p>Осенние каникулы. Занятий нет.</p>
+        </article>
+
+        <article class="lesson lesson--plain">
+          <h4>25 октября</h4>
+          <p>Общий творческий урок / просмотр фильма.</p>
+        </article>
+      </details>
+
+      <details class="schedule-month-block">
+        <summary><h3 class="schedule-month">Сентябрь<span class="schedule-month__year">-2026</span></h3></summary>
+
+        <article class="lesson">
+          <h4>6 сентября</h4>
+          <div class="lesson-groups">
+            <section class="lesson-group">
+              <h5>Младшая группа — Наталья Борисовна <small>(пом. София/Юлия Тран)</small></h5>
+              <ol>
+                <li>Краткое знакомство (помогаем детям вспомнить имена друг друга, напомнить правила как вести себя на уроке, в храме, что будем делать на уроках). Святой покровитель нашего храма св. Александр Невский — рассказ или просмотр мультфильма.</li>
+                <li>Творческая часть.</li>
+              </ol>
+            </section>
+            <section class="lesson-group">
+              <h5>Старшая группа — Анна Йолинг</h5>
+              <ol>
+                <li>Евангелие дня: <a href="https://days.pravoslavie.ru/bible/z_mf_22_1_14.html#z">Мф., 89 зач., XXII, 1-14.</a></li>
+                <li>Ветхий Завет: сотворение мира и наша ответственность перед Творцом. Грехопадение и его последствия для человека и природы. Молитва о творении Божием.</li>
+              </ol>
+            </section>
+          </div>
+          <p class="lesson-note">После окончания службы совместный пикник в Maaspark. Приглашаем всех желающих!</p>
+        </article>
+
+        <article class="lesson">
+          <h4>13 сентября</h4>
+          <div class="lesson-groups">
+            <section class="lesson-group">
+              <h5>Младшая группа — Ия Александровна <small>(пом. Анна ван дер Занде)</small></h5>
+              <ol>
+                <li>О Боге и Его свойствах. О любви Бога к людям.</li>
+                <li>Творческая часть.</li>
+              </ol>
+            </section>
+            <section class="lesson-group">
+              <h5>Старшая группа — Лариса Викторовна</h5>
+              <ol>
+                <li>Евангелие дня: <a href="https://days.pravoslavie.ru/bible/z_mf_22_35_46.html#z">Мф., 92 зач., XXII, 35-46.</a></li>
+                <li>Ветхий Завет: Адам и Ева. Человек как образ и подобие Божие. Таинство Брака на примере Св. Петра и Февронии Муромских.</li>
+              </ol>
+            </section>
+          </div>
+        </article>
+
+        <article class="lesson">
+          <h4>20 сентября</h4>
+          <div class="lesson-groups">
+            <section class="lesson-group">
+              <h5>Младшая группа — Лариса Викторовна <small>(пом. Юлия Яхина)</small></h5>
+              <ol>
+                <li>Церковные Праздники в сентябре (кратко). Праздник Рождества Пресвятой Богородицы.</li>
+                <li>Творческая часть.</li>
+              </ol>
+            </section>
+            <section class="lesson-group">
+              <h5>Старшая группа — София Харлампиевна</h5>
+              <ol>
+                <li>Евангелие дня: <a href="https://days.pravoslavie.ru/bible/z_in_3_13_17.html#z">Ин., 9 зач., III, 13-17.</a></li>
+                <li>Ветхий Завет: Пророчества о Рождестве Пресвятой Богородицы. Попросить ребят рассказать о Празднике. О призвании христианина.</li>
+              </ol>
+            </section>
+          </div>
+        </article>
+
+        <article class="lesson">
+          <h4>27 сентября</h4>
+          <div class="lesson-groups">
+            <section class="lesson-group">
+              <h5>Младшая группа — Анастасия Валерьевна <small>(пом. Анастасия)</small></h5>
+              <ol>
+                <li>Праздник Воздвижения Креста Господня; о Кресте и о Крестном знамении.</li>
+                <li>Творческая часть.</li>
+              </ol>
+            </section>
+            <section class="lesson-group">
+              <h5>Старшая группа — Ия Александровна</h5>
+              <ol>
+                <li>Евангелие дня: <a href="https://days.pravoslavie.ru/bible/z_in_19_6_11_19_13_20_19_25_28_19_30_35.html#z">Ин., 60 зач., XIX, 6-11, 13-20, 25-28, 30-35.</a></li>
+                <li>Попросить ребят рассказать на уроке о Празднике Воздвижения Животворящего Креста Господня. Грехопадение и спасение.</li>
+              </ol>
+            </section>
+          </div>
+        </article>
+      </details>
+    </div>
 
     <h2>orthodox kerk</h2>
     <div class="image-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
