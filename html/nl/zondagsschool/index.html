@@ -49,6 +49,7 @@
       <div class="hero-overlay"></div>
       <div class="hero-content" style="text-align:left;">
         <h2>Zondagsschool voor kinderen</h2>
+        <p class="lang-notice"><strong>Let op:</strong> de zondagsschool wordt uitsluitend in het Russisch gegeven.</p>
         <p>Vakken die worden gegeven:</p>
         <ul>
           <li>Gewijde geschiedenis van het Oude en Nieuwe Testament</li>
@@ -56,39 +57,21 @@
           <li>Orthodoxe kerkdienst</li>
           <li>Kerk-Slavisch</li>
         </ul>
-        <p style="margin-top:1.5rem;"><a href="#" class="btn-primary">Inschrijven</a></p>
+        <p style="margin-top:1.5rem;">
+          <button type="button" class="btn-primary" onclick="document.getElementById('ru-only-dialog').showModal()">Inschrijven</button>
+        </p>
       </div>
     </section>
 
-    <h2>orthodox kerk</h2>
-    <div class="image-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+    <dialog id="ru-only-dialog" class="confirm-dialog">
       <article>
-        <img src="../../img/06ac8146-27d3-4e44-b023-9ae32ebed27c.avif" alt="Cursussen" loading="lazy">
-        <div style="padding:1.5rem;">
-          <h3>Cursussen</h3>
-          <p>Wil je basisvaardigheden leren, je competenties verbeteren of beginnen op een professioneel niveau te trainen? We hebben cursussen op alle niveaus. Kun je niet kiezen? Neem contact met ons op, we helpen je graag. Of je boekt meteen vandaag nog je introductieles!</p>
-          <p><a href="#" class="btn-primary">Reserveer je plek</a></p>
-        </div>
+        <p>De zondagsschool wordt uitsluitend in het Russisch gegeven. Voor inschrijving kunt u de Russische pagina bezoeken.</p>
+        <footer>
+          <button type="button" class="btn-secondary" onclick="document.getElementById('ru-only-dialog').close()">Sluiten</button>
+          <a href="../../ru/voskresnaya-shkola/" class="btn-primary">Naar de Russische pagina</a>
+        </footer>
       </article>
-
-      <article>
-        <img src="../../img/ac8ae457-5db4-4210-a758-65b1e190b353.webp" alt="Halfgevorderden" loading="lazy">
-        <div style="padding:1.5rem;">
-          <h3>Halfgevorderden</h3>
-          <p>Doe ervaring op.</p>
-          <p><a href="#" class="btn-primary">Reserveer je plek</a></p>
-        </div>
-      </article>
-
-      <article>
-        <img src="../../img/edff23ef-a35c-4154-aa9d-88dbea627761.avif" alt="Beginners" loading="lazy">
-        <div style="padding:1.5rem;">
-          <h3>Beginners</h3>
-          <p>Ontwikkel je kerncompetenties.</p>
-          <p><a href="#" class="btn-primary">Reserveer je plek</a></p>
-        </div>
-      </article>
-    </div>
+    </dialog>
   </main>
   <footer class="site-footer">
     <p>Kerk van de Heilige Grootvorst Alexander Nevski</p>

@@ -30,6 +30,7 @@
   --pico-h5-color: #000;
   --pico-h6-color: #000;
   --pico-table-border-color: #e0ddd8;
+  --pico-modal-overlay-background-color: rgba(0, 0, 0, 0.5);
   color-scheme: light;
 }
 
@@ -377,25 +378,106 @@ body > main { padding-top: 112px; }
   }
 }
 
-/* Black CTA button */
-.btn-primary {
+/* --- CTA buttons ---
+   Shared box model so <a> and <button> render at identical size, and so
+   PicoCSS's own button defaults (blue background, 1rem font, its own padding)
+   can never leak in. Selectors are doubled with button/a to outrank Pico's
+   [type=button] attribute selector regardless of stylesheet order. */
+.btn-primary,
+.btn-secondary,
+button.btn-primary,
+button.btn-secondary,
+a.btn-primary,
+a.btn-secondary {
   display: inline-block;
-  background: #000;
-  color: #fff !important;
+  box-sizing: border-box;
+  margin: 0;
   padding: 12px 32px;
-  text-decoration: none !important;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: inherit;
   font-size: 0.8rem;
   font-weight: 500;
+  line-height: 1.5;
   letter-spacing: 0.05em;
-  border: none;
-  border-radius: 0;
+  text-align: center;
+  text-decoration: none !important;
   cursor: pointer;
+  box-shadow: none;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.btn-primary:hover {
-  background: #333;
+/* Solid CTA button — deep burgundy */
+.btn-primary,
+button.btn-primary,
+a.btn-primary {
+  background: #6f2232;
+  border-color: #6f2232;
   color: #fff !important;
-  text-decoration: none !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+a.btn-primary:hover {
+  background: #8c2c40;
+  border-color: #8c2c40;
+  color: #fff !important;
+}
+
+/* Outline CTA button, pairs with .btn-primary (e.g. "cancel" actions) */
+.btn-secondary,
+button.btn-secondary,
+a.btn-secondary {
+  background: transparent;
+  border-color: #6f2232;
+  color: #6f2232 !important;
+}
+
+.btn-secondary:hover,
+button.btn-secondary:hover,
+a.btn-secondary:hover {
+  background: rgba(111, 34, 50, .08);
+  border-color: #6f2232;
+  color: #6f2232 !important;
+}
+
+.btn-primary:focus,
+.btn-secondary:focus,
+button.btn-primary:focus,
+button.btn-secondary:focus,
+a.btn-primary:focus,
+a.btn-secondary:focus {
+  box-shadow: none;
+  outline: 2px solid #6f2232;
+  outline-offset: 2px;
+}
+
+/* --- Confirm dialog (e.g. language-availability notice) --- */
+dialog.confirm-dialog > article {
+  max-width: 440px;
+}
+
+dialog.confirm-dialog > article > footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+dialog.confirm-dialog > article > footer > * {
+  margin: 0 !important;
+}
+
+/* --- Language availability notice --- */
+.lang-notice {
+  font-size: 0.85rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.lang-notice strong {
+  color: #c62828;
 }
 
 /* --- White content sections (matching Jimdo css-9s1hn) --- */

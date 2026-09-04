@@ -49,6 +49,7 @@
       <div class="hero-overlay"></div>
       <div class="hero-content" style="text-align:left;">
         <h2>Sunday School for children</h2>
+        <p class="lang-notice"><strong>Please note:</strong> Sunday School classes are conducted in Russian only.</p>
         <p>Subjects taught:</p>
         <ul>
           <li>Sacred History of the Old and New Testament</li>
@@ -56,39 +57,21 @@
           <li>Orthodox Worship</li>
           <li>Church Slavonic</li>
         </ul>
-        <p style="margin-top:1.5rem;"><a href="#" class="btn-primary">Enrol</a></p>
+        <p style="margin-top:1.5rem;">
+          <button type="button" class="btn-primary" onclick="document.getElementById('ru-only-dialog').showModal()">Enrol</button>
+        </p>
       </div>
     </section>
 
-    <h2>orthodox kerk</h2>
-    <div class="image-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+    <dialog id="ru-only-dialog" class="confirm-dialog">
       <article>
-        <img src="../../img/06ac8146-27d3-4e44-b023-9ae32ebed27c.avif" alt="Courses" loading="lazy">
-        <div style="padding:1.5rem;">
-          <h3>Courses</h3>
-          <p>Do you want to learn the basics, improve your skills, or start training at a professional level? We have courses for all levels. Can't decide? Contact us — we are happy to help. Or book your introductory lesson today!</p>
-          <p><a href="#" class="btn-primary">Reserve your place</a></p>
-        </div>
+        <p>Sunday School classes are conducted in Russian only. To enrol, please visit the Russian-language page.</p>
+        <footer>
+          <button type="button" class="btn-secondary" onclick="document.getElementById('ru-only-dialog').close()">Close</button>
+          <a href="../../ru/voskresnaya-shkola/" class="btn-primary">Go to the Russian page</a>
+        </footer>
       </article>
-
-      <article>
-        <img src="../../img/ac8ae457-5db4-4210-a758-65b1e190b353.webp" alt="Intermediate" loading="lazy">
-        <div style="padding:1.5rem;">
-          <h3>Intermediate</h3>
-          <p>Gain experience.</p>
-          <p><a href="#" class="btn-primary">Reserve your place</a></p>
-        </div>
-      </article>
-
-      <article>
-        <img src="../../img/edff23ef-a35c-4154-aa9d-88dbea627761.avif" alt="Beginners" loading="lazy">
-        <div style="padding:1.5rem;">
-          <h3>Beginners</h3>
-          <p>Develop your core skills.</p>
-          <p><a href="#" class="btn-primary">Reserve your place</a></p>
-        </div>
-      </article>
-    </div>
+    </dialog>
   </main>
   <footer class="site-footer">
     <p>Church of the Holy Prince Alexander Nevsky</p>
