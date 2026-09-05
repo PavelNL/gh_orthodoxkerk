@@ -49,7 +49,7 @@
         <div style="padding:1.5rem;">
           <h3>Voor het onderhoud van de kerk</h3>
           <p>Geachte bezoekers en parochianen! Onze kerk heeft uw steun nodig om de gelovigen te blijven dienen en de samenleving te helpen. We zorgen voor het behoud van ons heilige gebouw en houden het in goede staat om steeds meer mensen te verwelkomen. Als u ons hierbij wilt helpen, overweeg dan een donatie voor de ondersteuning van onze kerk. Uw gift helpt ons het gebouw goed te onderhouden. U kunt online doneren. Hartelijk dank voor uw steun!</p>
-          <p><a href="#" class="btn-primary">Steun de kerk</a></p>
+          <p><button type="button" class="btn-primary" onclick="document.getElementById('construction-dialog').showModal()">Steun de kerk</button></p>
         </div>
       </article>
       <article>
@@ -57,10 +57,20 @@
         <div style="padding:1.5rem;">
           <h3>Voor algemene behoeften</h3>
           <p>Geachte bezoekers en parochianen! Onze kerk heeft uw steun nodig om haar missie voort te zetten en de samenleving te dienen. We verzorgen religieuze diensten, ondersteunen priesters en nemen deel aan activiteiten gericht op geestelijke en culturele ontwikkeling. Als u ons hierbij wilt helpen, overweeg dan een donatie voor de algemene behoeften van onze kerk. Uw gift helpt ons onze missie voort te zetten. Neem contact met ons op voor informatie over donatiemogelijkheden, of doneer direct online. Hartelijk dank voor uw steun!</p>
-          <p><a href="#" class="btn-primary">Doneer</a></p>
+          <p><button type="button" class="btn-primary" onclick="document.getElementById('construction-dialog').showModal()">Doneer</button></p>
         </div>
       </article>
     </div>
+
+    <dialog id="construction-dialog" class="confirm-dialog">
+      <article>
+        <p>Onze excuses, deze pagina is nog in aanbouw.<br>
+        Kom binnenkort terug.<br></p>
+        <footer>
+          <button type="button" class="btn-secondary" onclick="document.getElementById('construction-dialog').close()">Sluiten</button>
+        </footer>
+      </article>
+    </dialog>
   </main>
   <footer class="site-footer">
     <p>Kerk van de Heilige Grootvorst Alexander Nevski</p>
