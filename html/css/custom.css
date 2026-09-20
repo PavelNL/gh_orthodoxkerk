@@ -505,6 +505,25 @@ dialog.confirm-dialog > article > footer > * {
   margin: 1.5rem 0;
 }
 
+/* Cards that end in a CTA: keep the buttons on one line across columns,
+   however long each card's text is. Add .card-action to the button's <p>. */
+.image-grid--actions article {
+  display: flex;
+  flex-direction: column;
+}
+
+.image-grid--actions article > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.image-grid--actions .card-action {
+  margin-top: auto;
+  margin-bottom: 0;
+  padding-top: 1rem;
+}
+
 .image-grid img {
   width: 100%;
   height: auto;
